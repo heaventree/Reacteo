@@ -56,7 +56,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/reacteo.git
+git clone https://github.com/heaventree-ltd/reacteo.git
 cd reacteo
 
 # Install dependencies
@@ -380,9 +380,9 @@ Contributors will be:
 
 ## Questions?
 
-- Check the [documentation](./AI_INTEGRATION_GUIDE.md)
-- Search [existing issues](https://github.com/yourusername/reacteo/issues)
-- Open a [discussion](https://github.com/yourusername/reacteo/discussions)
+- Check the [README](./README.md)
+- Search [existing issues](https://github.com/heaventree-ltd/reacteo/issues)
+- Open a [discussion](https://github.com/heaventree-ltd/reacteo/discussions)
 - Read the [Code of Conduct](./CODE_OF_CONDUCT.md)
 
 ---

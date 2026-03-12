@@ -19,12 +19,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/reacteo.git"
+    "url": "https://github.com/heaventree-ltd/reacteo.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/reacteo/issues"
+    "url": "https://github.com/heaventree-ltd/reacteo/issues"
   },
-  "homepage": "https://github.com/yourusername/reacteo#readme",
+  "homepage": "https://github.com/heaventree-ltd/reacteo#readme",
   "engines": {
     "node": ">=16.13.0"
   },

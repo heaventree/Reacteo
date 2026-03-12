@@ -122,8 +122,8 @@ Currently, there are no known security vulnerabilities.
 Security advisories will be published in the GitHub Security Advisory database when vulnerabilities are discovered and fixed.
 
 Subscribe to releases to be notified of security updates:
-- GitHub Releases: https://github.com/yourusername/reacteo/releases
-- RSS Feed: https://github.com/yourusername/reacteo/releases.atom
+- GitHub Releases: https://github.com/heaventree-ltd/reacteo/releases
+- RSS Feed: https://github.com/heaventree-ltd/reacteo/releases.atom
 
 ## Responsible Disclosure
 

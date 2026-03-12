@@ -45,4 +45,4 @@ Any additional information that might be helpful.
 
 ---
 
-**Note:** For quick questions and discussions, consider using [GitHub Discussions](https://github.com/yourusername/reacteo/discussions) instead of issues.
+**Note:** For quick questions and discussions, consider using [GitHub Discussions](https://github.com/heaventree-ltd/reacteo/discussions) instead of issues.

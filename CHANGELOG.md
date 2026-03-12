@@ -51,11 +51,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Support
 
-- Issues: https://github.com/yourusername/reacteo/issues
+- Issues: https://github.com/heaventree-ltd/reacteo/issues
 - Security: security@heaventree.co
 
 ---
 
-[Unreleased]: https://github.com/yourusername/reacteo/compare/v1.0.1...main
-[1.0.1]: https://github.com/yourusername/reacteo/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/yourusername/reacteo/releases/tag/v1.0.0
+[Unreleased]: https://github.com/heaventree-ltd/reacteo/compare/v1.0.1...main
+[1.0.1]: https://github.com/heaventree-ltd/reacteo/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/heaventree-ltd/reacteo/releases/tag/v1.0.0

@@ -94,7 +94,7 @@ git clone https://github.com/yourfork/reacteo.git
 cd reacteo
 
 # Add upstream remote for sync
-git remote add upstream https://github.com/original/reacteo.git
+git remote add upstream https://github.com/heaventree-ltd/reacteo.git
 ```
 
 ### Install Dependencies
@@ -555,9 +555,9 @@ supabase migration up
 
 ## Getting Help
 
-- Check existing issues: https://github.com/yourusername/reacteo/issues
-- Search documentation: [AI_INTEGRATION_GUIDE.md](./AI_INTEGRATION_GUIDE.md)
-- Ask in discussions: https://github.com/yourusername/reacteo/discussions
+- Check existing issues: https://github.com/heaventree-ltd/reacteo/issues
+- Search documentation: [README.md](./README.md)
+- Ask in discussions: https://github.com/heaventree-ltd/reacteo/discussions
 - Read contribution guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ---

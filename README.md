@@ -64,7 +64,7 @@ Requires a live Supabase project with the three edge functions deployed. Without
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/yourusername/reacteo.git
+git clone https://github.com/heaventree-ltd/reacteo.git
 cd reacteo
 npm install
 ```
