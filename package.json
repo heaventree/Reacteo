@@ -4,6 +4,19 @@
   "description": "AI-powered SEO system for React applications",
   "private": false,
   "type": "module",
+  "main": "./dist/lib/index.cjs",
+  "module": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/lib/index.js",
+      "require": "./dist/lib/index.cjs",
+      "types": "./dist/lib/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/lib"
+  ],
   "keywords": [
     "react",
     "seo",
@@ -32,6 +45,7 @@
     "dev": "vite",
     "build": "vite build",
     "postbuild": "node scripts/generate-sitemap.js && node scripts/generate-robots.js",
+    "build:lib": "vite build --config vite.lib.config.ts",
     "seo:audit": "node scripts/seo-audit.js",
     "seo:audit:pre-deploy": "npm run build && npm run seo:audit",
     "lint": "eslint .",
@@ -40,14 +54,19 @@
   },
   "peerDependencies": {
     "react": ">=17.0.0",
-    "react-dom": ">=17.0.0"
+    "react-dom": ">=17.0.0",
+    "react-helmet-async": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-helmet-async": {
+      "optional": false
+    }
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
     "lucide-react": "^0.344.0",
     "react-helmet-async": "^3.0.0",
-    "sitemap": "^9.0.1",
-    "vite-plugin-prerender": "^1.0.8"
+    "sitemap": "^9.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",

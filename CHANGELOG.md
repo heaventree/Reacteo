@@ -10,10 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- npm package with proper `exports` and `main` fields so `src/lib/seo/` can be installed directly
-- Replace `vite-plugin-prerender` with a maintained alternative
 - Unit tests for schema builders and validation utils
 - AI audit fallback UI when Supabase is not configured
+
+---
+
+## [1.0.2] - 2026-03-12
+
+### Added
+- `exports`, `main`, `module`, `types`, and `files` fields in `package.json` — the SEO library (`src/lib/seo/`) can now be consumed directly after running `npm run build:lib`
+- `vite.lib.config.ts` — dedicated Vite library build config that compiles `src/lib/seo/index.ts` to `dist/lib/index.js` (ESM) and `dist/lib/index.cjs` (CJS) with source maps; `react`, `react-dom`, and `react-helmet-async` are correctly externalised
+- `build:lib` npm script for running the library build separately from the app build
+- `react-helmet-async` promoted to `peerDependencies` since it is a required runtime dependency for consumers
+
+### Removed
+- `vite-plugin-prerender` removed from `dependencies` — the package was listed but never imported. Consumers who need static pre-rendering can use [`vite-prerender-plugin`](https://www.npmjs.com/package/vite-prerender-plugin) (Preact team, no headless browser required) or any other Vite-compatible SSG tool
 
 ---
 
@@ -56,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/heaventree-ltd/reacteo/compare/v1.0.1...main
+[Unreleased]: https://github.com/heaventree-ltd/reacteo/compare/v1.0.2...main
+[1.0.2]: https://github.com/heaventree-ltd/reacteo/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/heaventree-ltd/reacteo/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/heaventree-ltd/reacteo/releases/tag/v1.0.0
