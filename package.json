@@ -1,8 +1,33 @@
 {
-  "name": "vite-react-typescript-starter",
-  "private": true,
-  "version": "0.0.0",
+  "name": "reacteo",
+  "version": "1.0.0",
+  "description": "AI-powered SEO system for React applications",
+  "private": false,
   "type": "module",
+  "keywords": [
+    "react",
+    "seo",
+    "ai",
+    "typescript",
+    "supabase",
+    "open-graph",
+    "structured-data",
+    "sitemap",
+    "schema-org"
+  ],
+  "author": "Sean O'Byrne <sean@heaventree.co> (https://heaventree.co)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/reacteo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/reacteo/issues"
+  },
+  "homepage": "https://github.com/yourusername/reacteo#readme",
+  "engines": {
+    "node": ">=16.13.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -13,11 +38,13 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
     "lucide-react": "^0.344.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "react-helmet-async": "^3.0.0",
     "sitemap": "^9.0.1",
     "vite-plugin-prerender": "^1.0.8"
@@ -33,6 +60,8 @@
     "eslint-plugin-react-refresh": "^0.4.11",
     "globals": "^15.9.0",
     "postcss": "^8.4.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwindcss": "^3.4.1",
     "terser": "^5.46.0",
     "typescript": "^5.5.3",

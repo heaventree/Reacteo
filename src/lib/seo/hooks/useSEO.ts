@@ -1,33 +1,59 @@
-import { useEffect } from 'react';
+import { useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import type { SEOProps } from '../types';
-import { SEO } from '../components/SEO';
-import React from 'react';
+import { useSEOContext } from '../context/SEOProvider';
 
 /**
- * useSEO Hook - Inject SEO metadata without JSX wrapping
+ * useSEO - Returns props to spread onto the <SEO> component.
+ *
+ * This hook resolves defaults from SEOProvider context so callers can provide
+ * only the page-specific overrides. Useful when you want to compute SEO props
+ * from component logic before rendering.
  *
  * Usage:
  * ```tsx
- * function ProductPage() {
- *   useSEO({
- *     title: 'Product Name',
- *     description: 'Product description',
+ * function ProductPage({ product }) {
+ *   const seoProps = useSEO({
+ *     title: product.name,
+ *     description: product.summary,
+ *     openGraph: { type: 'product', url: product.url },
  *   });
  *
- *   return <div>Product content</div>;
+ *   return (
+ *     <>
+ *       <SEO {...seoProps} />
+ *       <div>{product.name}</div>
+ *     </>
+ *   );
  * }
  * ```
+ *
+ * Note: You still need to render <SEO {...seoProps} /> in your JSX.
+ * For direct JSX usage, use <SEO> without this hook.
  */
-export const useSEO = (props: SEOProps) => {
-  useEffect(() => {
-    // This is a simple hook that manages SEO context
-    // The actual rendering is handled by the SEO component
-    return () => {
-      // Cleanup on unmount
-    };
-  }, [props]);
+export const useSEO = (props: SEOProps): SEOProps => {
+  const { config } = useSEOContext();
 
-  // Return the SEO component to be rendered
-  // Note: This should be rendered in the component's JSX tree
-  return React.createElement(SEO, props);
+  return useMemo<SEOProps>(() => ({
+    ...props,
+    title: props.title,
+    description: props.description || config.defaultDescription,
+    canonical: props.canonical,
+    openGraph: props.openGraph
+      ? {
+          ...props.openGraph,
+          image: props.openGraph.image || config.defaultOGImage,
+        }
+      : undefined,
+    twitter: props.twitter,
+    jsonLd: props.jsonLd,
+    noindex: props.noindex ?? false,
+    nofollow: props.nofollow ?? false,
+  }), [
+    props,
+    config.defaultDescription,
+    config.defaultOGImage,
+  ]);
 };
+
+export { Helmet };

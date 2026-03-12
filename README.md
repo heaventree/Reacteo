@@ -1,175 +1,67 @@
-# Reacteo - AI-Powered SEO System for React
+# Reacteo
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#build-status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-5.4-646cff.svg)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://react.dev/)
 
-**Reacteo** is the open-source SEO system for React applications, powered by AI. Manage SEO, create blog content, and audit pages with an intelligent admin dashboard supporting 5 major AI providers.
-
-## 🚀 What is Reacteo?
-
-Reacteo is a **production-ready, AI-enhanced SEO management platform** for React applications. It combines:
-
-- **5 AI Providers** - OpenAI, Google Gemini, Claude, Perplexity, Deepseek
-- **Intelligent SEO Audits** - Comprehensive page analysis (H1/H2, metadata, images, keywords, readability, schema)
-- **Blog Management System** - Create SEO-optimized blog posts with automatic validation
-- **Page Analysis Engine** - Extract and analyze page content, structure, and metrics
-- **Admin Dashboard** - Beautiful, functional control panel for all SEO operations
-- **Enterprise Database** - Supabase backend with Row Level Security
-- **React Integration** - Hooks API + pre-built components
-
-Think of it as **Yoast SEO meets ChatGPT**, but open-source and built for React developers.
+An AI-powered SEO system for React applications. Manage metadata, structured data, page audits, and blog content from a single admin dashboard backed by [Supabase](https://supabase.com/).
 
 ---
 
-## ✨ Core Features
+## What's in here
 
-### 🤖 Multi-Provider AI Integration
+### `src/lib/seo/` — The SEO library
 
-Switch between **5 major AI providers** and choose the best for each task:
+The core of Reacteo. Zero dependencies beyond `react-helmet-async`.
 
-| Provider | Best For | Model |
-|----------|----------|-------|
-| **OpenAI** | Complex analysis, detailed reports | GPT-4 Turbo, GPT-3.5 |
-| **Google Gemini** | Cost-effective audits | Gemini Pro |
-| **Anthropic Claude** | Nuanced content, creative tasks | Claude 3 Opus |
-| **Perplexity** | Real-time research, web-aware insights | Perplexity Online |
-| **Deepseek** | Fast responses, efficient processing | Deepseek Chat |
+| File | What it does |
+|------|-------------|
+| `components/SEO.tsx` | Drop-in component for title, description, OG, Twitter Card, JSON-LD, canonical URL, robots |
+| `components/Image.tsx` | Performance-focused `<img>` with lazy loading, srcSet, AVIF/WebP `<picture>`, CLS prevention |
+| `context/SEOProvider.tsx` | Wraps `HelmetProvider`, provides site config via context |
+| `hooks/useSEO.ts` | Returns resolved `SEOProps` from context defaults — spread onto `<SEO>` |
+| `utils/schema.ts` | Typed JSON-LD builders: WebSite, Article, Breadcrumb, Product, LocalBusiness |
+| `utils/validation.ts` | Config and deployment validation helpers |
+| `types/index.ts` | All TypeScript types |
 
-### 🔍 Comprehensive SEO Auditing
+This folder is self-contained. To use it in another project, copy `src/lib/seo/` and install `react-helmet-async`.
 
-Run intelligent audits that analyze:
+### `src/lib/ai/` — The AI audit layer
 
-- **Heading Structure** - H1/H2 hierarchy validation
-- **Metadata Quality** - Title (30-60 chars), description (120-160 chars) scoring
-- **Image Analysis** - Alt text completeness and descriptiveness
-- **Keyword Optimization** - Density, placement, and relevance
-- **Content Readability** - Sentence structure, complexity, flow
-- **Link Metrics** - Internal vs external balance, authority
-- **Schema Validation** - JSON-LD completeness and correctness
-- **URL Optimization** - Slug quality and keyword inclusion
+Requires a live Supabase project with the three edge functions deployed. Without that, the AI features won't work. See [Prerequisites](#prerequisites).
 
-**Audit Output:**
-- Overall SEO score (0-100)
-- Readability score (0-100)
-- Critical issues (must fix)
-- Warnings (should fix)
-- Actionable suggestions with priority levels
+| File | What it does |
+|------|-------------|
+| `service.ts` | Routes requests to OpenAI, Gemini, Claude, Perplexity, or Deepseek |
+| `blog.ts` | Blog post CRUD via Supabase (`blog_posts`, `seo_pages` tables) |
+| `crawler.ts` | Fetches a URL and extracts headings, images, links, content |
+| `hooks.ts` | React hooks: `useAIAudit`, `useBlogPosts`, `usePageContent`, etc. |
 
-### 📝 Blog Management System
+### `supabase/functions/` — Edge Functions
 
-**Full-featured blog platform** with SEO validation:
+| Function | What it does |
+|----------|-------------|
+| `ai-generate` | Proxies requests to whichever AI provider is configured |
+| `ai-models` | CRUD for AI model configs stored in Supabase |
+| `ai-audit` | Saves audit results to `ai_audits` and `seo_suggestions` tables |
 
-- Create/Edit/Delete blog posts
-- SEO metadata (title, description, keywords)
-- Auto-calculated word count and reading time
-- Featured image with alt text
-- Tags and categories
-- Publication workflow
-- Search across posts
-- Draft management
+### `scripts/` — Build scripts
 
-**Built-in SEO Validation:**
-- Title length (30-60 characters)
-- Description length (120-160 characters)
-- Featured image required
-- Alt text for all images
-- Minimum content length (300+ words)
-
-### 📊 Page Content Analysis
-
-**Intelligent page crawling** that extracts:
-
-- Page metadata (title, description, canonical)
-- Heading hierarchy (H1-H6)
-- Image analysis (src, alt, title)
-- Link analysis (internal/external, text)
-- Main content (cleaned, readable text)
-- Word count and reading time
-- Page structure metrics
-
-### 🎛️ Admin Dashboard
-
-**Beautiful, intuitive control panel** with 4 tabs:
-
-1. **Overview** - Statistics and welcome guide
-2. **AI Models** - Configure and manage AI providers
-3. **SEO Audit** - Run page audits and view results
-4. **Blog** - Create and manage blog posts
-
-### 💾 Database Backend
-
-**Supabase integration** with 8 tables:
-
-- `ai_models` - AI model configurations
-- `seo_pages` - Pages being tracked
-- `ai_audits` - Complete audit results
-- `seo_content` - Page content analysis
-- `seo_suggestions` - AI-generated recommendations
-- `blog_posts` - Blog content and metadata
-- `schema_definitions` - JSON-LD schemas
-- `url_configurations` - URL optimization data
-
-**All tables include:**
-- Row Level Security (RLS) policies
-- Proper indexing for performance
-- Timestamp tracking (created_at, updated_at)
-- Cascade delete for referential integrity
+- `generate-sitemap.js` — Post-build, generates `dist/sitemap.xml` from `seo-config.ts`
+- `generate-robots.js` — Post-build, generates `dist/robots.txt`
+- `seo-audit.js` — Pre-deploy checks: sitemap valid, robots.txt present, HTML exists
 
 ---
 
-## 🛠️ Tech Stack
-
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **Frontend** | React 18, TypeScript, Vite | UI and components |
-| **Styling** | Tailwind CSS | Responsive design |
-| **Backend** | Supabase Edge Functions | Serverless API |
-| **Database** | Supabase (PostgreSQL) | Data storage |
-| **AI Providers** | OpenAI, Gemini, Claude, Perplexity, Deepseek | AI processing |
-| **Icons** | Lucide React | Beautiful icons |
-
----
-
-## 📦 What's Included
-
-### Services (970 lines)
-- **AIService** - Unified interface for 5 AI providers
-- **BlogService** - Complete content management
-- **PageCrawler** - Intelligent page extraction
-- **Full TypeScript types** - Type-safe development
-
-### React Components (4 components, 780 lines)
-- **AdminDashboard** - Main control panel
-- **AIModelsConfig** - Model configuration UI
-- **BlogEditor** - Blog post editor with SEO validation
-- **SEOAuditReport** - Beautiful audit visualization
-
-### React Hooks (6 hooks, 180 lines)
-- `useAIModels()` - Manage AI models
-- `useAIAudit()` - Run page audits
-- `useBlogPost()` - Manage single blog post
-- `useBlogPosts()` - Manage multiple posts
-- `usePageContent()` - Crawl and analyze pages
-- `useBlogValidation()` - Validate blog SEO
-
-### Edge Functions (3 functions, 387 lines)
-- `ai-generate` - Multi-model AI routing
-- `ai-models` - Model management API
-- `ai-audit` - Audit result storage
-
----
-
-## 🚀 Quick Start
+## Quick start
 
 ### Prerequisites
-- Node.js 16+ and npm
-- Supabase account (free tier available)
-- API keys for at least one AI provider (optional)
 
-### 1. Clone and Install
+- Node.js 16+
+- A [Supabase](https://supabase.com/) project (free tier works)
+- API key for at least one AI provider if you want audit features
+
+### 1. Clone and install
 
 ```bash
 git clone https://github.com/yourusername/reacteo.git
@@ -177,334 +69,223 @@ cd reacteo
 npm install
 ```
 
-### 2. Environment Setup
+### 2. Environment variables
 
-Create `.env.local`:
+Copy the example file and fill in your values:
 
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+```bash
+cp .env.example .env.local
 ```
 
-### 3. Add API Keys (Optional)
+```env
+# Required for the app to run
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 
-Configure AI provider keys in Supabase:
-- Go to Settings → Edge Functions → Secrets
-- Add any of these:
-  - `OPENAI_API_KEY`
-  - `GEMINI_API_KEY`
-  - `CLAUDE_API_KEY`
-  - `PERPLEXITY_API_KEY`
-  - `DEEPSEEK_API_KEY`
+# Optional — only needed for AI audit features
+# Add these as Edge Function Secrets in your Supabase dashboard
+# Settings → Edge Functions → Secrets
+# OPENAI_API_KEY=sk-...
+# GEMINI_API_KEY=AIza...
+# CLAUDE_API_KEY=sk-ant-...
+# PERPLEXITY_API_KEY=pplx-...
+# DEEPSEEK_API_KEY=sk-...
 
-### 4. Development Server
+# Optional — for sitemap generation
+VITE_SEO_HOSTNAME=https://yourdomain.com
+```
+
+### 3. Run
 
 ```bash
 npm run dev
 ```
 
-Visit `http://localhost:5173/admin` to access the dashboard.
+Admin dashboard is at `http://localhost:5173/admin`.
 
-### 5. Build for Production
+### 4. Deploy
 
 ```bash
 npm run build
 ```
 
----
-
-## 📚 Documentation
-
-| Document | Purpose | Read Time |
-|----------|---------|-----------|
-| **[AI_QUICK_SETUP.md](./AI_QUICK_SETUP.md)** | 5-minute setup guide | 5 min |
-| **[AI_INTEGRATION_GUIDE.md](./AI_INTEGRATION_GUIDE.md)** | Complete API reference | 20 min |
-| **[AI_FEATURES_INDEX.md](./AI_FEATURES_INDEX.md)** | Feature overview | 10 min |
-| **[DEVELOPMENT.md](./DEVELOPMENT.md)** | Local development guide | 10 min |
-| **[CONTRIBUTING.md](./CONTRIBUTING.md)** | How to contribute | 5 min |
+Post-build scripts automatically generate `dist/sitemap.xml` and `dist/robots.txt`.
 
 ---
 
-## 📖 Usage Examples
+## Using the SEO library
 
-### Run an SEO Audit
+### Wrap your app
 
-```typescript
-import { useAIAudit } from './lib/ai';
+```tsx
+import { SEOProvider } from './lib/seo';
+import seoConfig from '../seo-config';
 
-export function AuditPage() {
-  const { auditPage, auditResult } = useAIAudit();
+function App() {
+  return (
+    <SEOProvider config={seoConfig}>
+      <Router />
+    </SEOProvider>
+  );
+}
+```
 
-  const handleAudit = async () => {
-    const result = await auditPage('/my-page', modelId);
-    console.log(result.seoScore); // 0-100
-    console.log(result.suggestions); // AI recommendations
-  };
+### Add metadata to a page
 
+```tsx
+import { SEO } from './lib/seo';
+
+function HomePage() {
   return (
     <>
-      <button onClick={handleAudit}>Audit Page</button>
-      {auditResult && <SEOAuditReport result={auditResult} />}
+      <SEO
+        title="Home"
+        description="Welcome to my site"
+        openGraph={{
+          type: 'website',
+          url: 'https://example.com/',
+          image: 'https://example.com/og.jpg',
+        }}
+      />
+      <main>...</main>
     </>
   );
 }
 ```
 
-### Create a Blog Post
+### Use the hook for computed props
 
-```typescript
-import { useBlogPost } from './lib/ai';
+```tsx
+import { SEO, useSEO } from './lib/seo';
 
-export function CreateBlog() {
-  const { createPost } = useBlogPost();
+function ProductPage({ product }) {
+  const seoProps = useSEO({
+    title: product.name,
+    description: product.summary,
+    openGraph: { type: 'product', url: product.url },
+  });
 
-  const handleSave = async (post) => {
-    await createPost({
-      title: 'My Awesome Post',
-      content: '...',
-      seoTitle: 'Optimized Title',
-      seoDescription: 'Optimized description',
-      wordCount: 1500,
-      readingTime: 7,
-    });
-  };
+  return (
+    <>
+      <SEO {...seoProps} />
+      <div>{product.name}</div>
+    </>
+  );
 }
 ```
 
-### Analyze Page Content
+### Add structured data
 
-```typescript
-import { PageCrawler } from './lib/ai';
+```tsx
+import { SEO, buildArticleSchema, buildBreadcrumbSchema } from './lib/seo';
 
-const content = await PageCrawler.crawlPage('/my-page');
-console.log(content.headings);      // Array of headings
-console.log(content.images);        // Array of images with alt
-console.log(content.wordCount);     // Total words
-console.log(content.readingTime);   // Minutes to read
+function BlogPost({ post }) {
+  return (
+    <SEO
+      title={post.title}
+      description={post.excerpt}
+      jsonLd={[
+        buildArticleSchema({
+          headline: post.title,
+          datePublished: post.publishedAt,
+          author: post.author.name,
+          image: post.coverImage,
+        }),
+        buildBreadcrumbSchema([
+          { name: 'Home', url: 'https://example.com' },
+          { name: 'Blog', url: 'https://example.com/blog' },
+          { name: post.title, url: post.url },
+        ]),
+      ]}
+    />
+  );
+}
+```
+
+### Optimized images
+
+```tsx
+import { Image } from './lib/seo';
+
+<Image
+  src="/hero.jpg"
+  alt="Hero image"
+  width={1200}
+  height={630}
+  priority
+/>
 ```
 
 ---
 
-## 🎯 Use Cases
+## Configure routes and sitemap
 
-### Digital Agencies
-- Audit client websites at scale
-- Generate SEO reports automatically
-- Manage blog content for multiple clients
+Edit `seo-config.ts` to define your site's routes:
 
-### E-commerce Platforms
-- Optimize product page SEO
-- Generate product descriptions
-- Audit category pages
-
-### Content Publishers
-- Manage blog content calendars
-- Auto-validate article SEO
-- Generate publishing suggestions
-
-### SaaS Platforms
-- Enhance docs with SEO
-- Monitor help article quality
-- Track SEO metrics over time
-
-### Content Creators
-- Self-publish SEO-optimized articles
-- Get AI-powered improvement suggestions
-- Track content performance
-
----
-
-## 🔐 Security
-
-### Database Security
-- ✅ Row Level Security (RLS) on all tables
-- ✅ Authenticated-user only access
-- ✅ Automatic timestamp tracking
-- ✅ Cascade delete protection
-
-### API Security
-- ✅ CORS headers properly configured
-- ✅ API keys stored securely in Supabase Secrets
-- ✅ Input validation on all endpoints
-- ✅ Error handling prevents information leakage
-
-### Code Security
-- ✅ TypeScript for type safety
-- ✅ No hardcoded secrets
-- ✅ Dependency scanning
-- ✅ Regular security updates
-
----
-
-## 📈 Performance
-
-- **Build time:** 3.76 seconds
-- **Bundle size:** 53.6 KB gzipped
-- **Type checking:** 0 errors
-- **SEO audit:** All checks passing
-- **Database queries:** Optimized with indexing
-
----
-
-## 🛣️ Roadmap
-
-### Version 1.0 (Current)
-- ✅ Multi-provider AI integration
-- ✅ SEO auditing engine
-- ✅ Blog management system
-- ✅ Admin dashboard
-- ✅ React hooks and components
-
-### Version 1.1 (Planned)
-- [ ] Batch audit scheduling
-- [ ] Audit history and trending
-- [ ] Content calendar
-- [ ] AI-powered content generation
-- [ ] Export audit reports (PDF)
-
-### Version 1.2 (Planned)
-- [ ] Multi-language support
-- [ ] Custom audit templates
-- [ ] Team collaboration features
-- [ ] Webhook integrations
-- [ ] Analytics dashboard
-
-### Version 2.0 (Long-term)
-- [ ] Real-time website monitoring
-- [ ] Competitive analysis
-- [ ] Backlink tracking
-- [ ] Mobile app
-- [ ] Enterprise features
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-
-### Quick Start for Contributors
-
-```bash
-# Fork the repository
-git clone https://github.com/yourfork/reacteo.git
-cd reacteo
-
-# Create a feature branch
-git checkout -b feat/amazing-feature
-
-# Install dependencies
-npm install
-
-# Make your changes and test
-npm run dev
-npm run typecheck
-npm run build
-
-# Commit and push
-git commit -m "feat: add amazing feature"
-git push origin feat/amazing-feature
-
-# Open a Pull Request
+```ts
+export const seoConfig: SEOConfig = {
+  hostname: import.meta.env.VITE_SEO_HOSTNAME || 'https://yourdomain.com',
+  appName: 'My App',
+  defaultDescription: 'My app does great things',
+  routes: [
+    { path: '/', priority: 1.0, changefreq: 'weekly', prerender: true },
+    { path: '/about', priority: 0.8, changefreq: 'monthly', prerender: true },
+    { path: '/blog', priority: 0.9, changefreq: 'daily', prerender: false },
+  ],
+};
 ```
 
----
-
-## 📝 License
-
-This project is licensed under the **MIT License** - see [LICENSE](./LICENSE) file for details.
-
-**Copyright © 2024 Sean O'Byrne, Heaventree Ltd.**
-
-You are free to:
-- Use this software for any purpose
-- Modify and distribute
-- Include it in proprietary applications
-
-See [LICENSE](./LICENSE) for full terms.
+The sitemap generator reads this file and outputs `dist/sitemap.xml` after every build.
 
 ---
 
-## 🙏 Acknowledgments
+## Database schema
 
-Built with:
-- [React](https://react.dev/) - UI library
-- [Vite](https://vitejs.dev/) - Build tool
-- [Supabase](https://supabase.com/) - Backend platform
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [Lucide React](https://lucide.dev/) - Icons
-- [AI Providers](https://openai.com/) - OpenAI, Gemini, Claude, Perplexity, Deepseek
+Eight Supabase tables, all with Row Level Security enabled:
 
----
+| Table | Purpose |
+|-------|---------|
+| `ai_models` | AI provider configurations |
+| `seo_pages` | Pages being tracked |
+| `ai_audits` | Audit results (scores, issues) |
+| `seo_content` | Extracted page content |
+| `seo_suggestions` | AI-generated recommendations |
+| `blog_posts` | Blog content |
+| `schema_definitions` | Saved JSON-LD schemas |
+| `url_configurations` | URL optimization data |
 
-## 💬 Support
-
-### Documentation
-- Read the [full documentation](./AI_INTEGRATION_GUIDE.md)
-- Check [quick start guide](./AI_QUICK_SETUP.md)
-- Browse [feature overview](./AI_FEATURES_INDEX.md)
-
-### Community
-- [GitHub Issues](https://github.com/yourusername/reacteo/issues) - Report bugs
-- [GitHub Discussions](https://github.com/yourusername/reacteo/discussions) - Ask questions
-- [Contributing Guide](./CONTRIBUTING.md) - How to contribute
-
-### Security
-- Found a security issue? See [SECURITY.md](./SECURITY.md)
+Migration is at `supabase/migrations/20260311231129_create_ai_seo_tables.sql`.
 
 ---
 
-## 📊 Project Stats
+## Copying the SEO library into an existing project
 
-| Metric | Value |
-|--------|-------|
-| **Total Code** | 3,587 lines |
-| **TypeScript** | 100% coverage |
-| **Tests** | Ready for contributors |
-| **Documentation** | 5 comprehensive guides |
-| **Components** | 4 production-ready |
-| **Hooks** | 6 custom hooks |
-| **Edge Functions** | 3 deployed |
-| **Database Tables** | 8 with RLS |
+If you want just the SEO primitives (no AI, no Supabase, no admin dashboard):
+
+1. Copy `src/lib/seo/` into your project
+2. Copy `seo-config.ts` and adjust it
+3. Install the one runtime dependency: `npm install react-helmet-async`
+4. Optionally copy `scripts/` for sitemap generation
+
+That's it. The SEO library has no other runtime dependencies.
 
 ---
 
-## 🌟 Getting Help
+## Roadmap
 
-### Common Issues
-
-**Q: How do I add API keys?**
-A: Go to Supabase → Settings → Edge Functions → Secrets and add your API keys.
-
-**Q: Can I use this without AI?**
-A: Yes! The SEO Kit works independently. AI features are optional enhancements.
-
-**Q: Is this production-ready?**
-A: Yes! It's built with production patterns and fully tested.
-
-**Q: Can I use this commercially?**
-A: Yes! MIT license allows commercial use. See [LICENSE](./LICENSE).
+- [ ] Proper npm package with `exports` field (currently a template — copy `src/lib/seo/` to use in other projects)
+- [ ] Replace `vite-plugin-prerender` with a better-maintained alternative
+- [ ] Unit tests for schema builders and validation utils
+- [ ] AI audit fallback when Supabase is not configured
 
 ---
 
-## 🚀 Get Started Now
+## Contributing
 
-1. **Clone the repo** - `git clone https://github.com/yourusername/reacteo.git`
-2. **Read the docs** - Start with [AI_QUICK_SETUP.md](./AI_QUICK_SETUP.md)
-3. **Run locally** - `npm install && npm run dev`
-4. **Visit dashboard** - Go to `http://localhost:5173/admin`
-5. **Start building** - Create your first audit or blog post!
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ---
 
-## 📞 Questions?
+## License
 
-- Check the [documentation](./AI_INTEGRATION_GUIDE.md)
-- Search [existing issues](https://github.com/yourusername/reacteo/issues)
-- Open a [new discussion](https://github.com/yourusername/reacteo/discussions)
-- Read the [contributing guide](./CONTRIBUTING.md)
-
----
-
-**Made with ❤️ by [Sean O'Byrne](https://heaventree.co) at [Heaventree Ltd](https://heaventree.co)**
-
-**Reacteo - The Go-To Open-Source SEO System for React**
+MIT — Copyright © 2024 Sean O'Byrne, Heaventree Ltd. See [LICENSE](./LICENSE).
