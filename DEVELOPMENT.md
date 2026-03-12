@@ -298,7 +298,9 @@ reacteo/
 │   └── functions/              # Edge Functions
 │       ├── ai-generate/
 │       ├── ai-models/
-│       └── ai-audit/
+│       ├── ai-audit/
+│       ├── seo-bulk-processor/
+│       └── seo-instant-indexing/
 ├── public/                     # Static assets
 ├── .env.local                  # Local environment (gitignored)
 ├── vite.config.ts             # Vite configuration
@@ -528,14 +530,17 @@ supabase status
 
 ### Migrations
 
-Database changes should be made through migrations:
+Apply the included backend schemas for templates, history, and AI keys:
 
 ```bash
-# Create new migration
-supabase migration new create_new_table
-
-# Apply migrations
+# Apply migrations to your local or remote database
 supabase migration up
+```
+
+To create a new migration for further schema changes:
+
+```bash
+supabase migration new feature_name
 ```
 
 ---

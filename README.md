@@ -4,7 +4,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://react.dev/)
 
-An AI-powered SEO system for React applications. Manage metadata, structured data, page audits, and blog content from a single admin dashboard backed by [Supabase](https://supabase.com/).
+An AI-powered SEO system for React applications. Manage template-driven metadata (like `%%post_title%%`), bulk AI generation, dynamic sitemaps, and audits from a single admin dashboard backed by [Supabase](https://supabase.com/).
 
 ---
 
@@ -14,14 +14,16 @@ An AI-powered SEO system for React applications. Manage metadata, structured dat
 
 The core of Reacteo. Zero dependencies beyond `react-helmet-async`.
 
-| File | What it does |
-|------|-------------|
-| `components/SEO.tsx` | Drop-in component for title, description, OG, Twitter Card, JSON-LD, canonical URL, robots |
-| `components/Image.tsx` | Performance-focused `<img>` with lazy loading, srcSet, AVIF/WebP `<picture>`, CLS prevention |
-| `context/SEOProvider.tsx` | Wraps `HelmetProvider`, provides site config via context |
+| File/Folder | What it does |
+|-------------|-------------|
+| `components/SEO.tsx` | Drop-in component for title, description, OG, Twitter, canonical, robots (supports templates) |
+| `admin/` | Dashboard UI components (`SettingsPanel`, `TemplateManager`, `BulkOperationsView`) |
+| `utils/template-engine.ts`| Parses WP-style tags like `%%post_title%%` and `%%sep%%` |
+| `utils/sitemap.ts` | Dynamic paginated XML sitemap generator for API routes |
+| `utils/robots.ts` | Dynamic robots.txt generator for API routes |
+| `context/SEOProvider.tsx`| Wraps `HelmetProvider`, provides site config via context |
 | `hooks/useSEO.ts` | Returns resolved `SEOProps` from context defaults — spread onto `<SEO>` |
 | `utils/schema.ts` | Typed JSON-LD builders: WebSite, Article, Breadcrumb, Product, LocalBusiness |
-| `utils/validation.ts` | Config and deployment validation helpers |
 | `types/index.ts` | All TypeScript types |
 
 This folder is self-contained. To use it in another project, copy `src/lib/seo/` and install `react-helmet-async`.
@@ -41,6 +43,8 @@ Requires a live Supabase project with the three edge functions deployed. Without
 
 | Function | What it does |
 |----------|-------------|
+| `seo-bulk-processor`| Background worker parsing templates & triggering AI for missing tags |
+| `seo-instant-indexing`| Pings Google & Bing APIs when pages update |
 | `ai-generate` | Proxies requests to whichever AI provider is configured |
 | `ai-models` | CRUD for AI model configs stored in Supabase |
 | `ai-audit` | Saves audit results to `ai_audits` and `seo_suggestions` tables |
@@ -241,20 +245,38 @@ The sitemap generator reads this file and outputs `dist/sitemap.xml` after every
 
 ## Database schema
 
-Eight Supabase tables, all with Row Level Security enabled:
+Supabase tables handling everything from page tracking to background job states, all with RLS:
 
 | Table | Purpose |
 |-------|---------|
+| `seo_global_settings`| Sitewide config (GA4, GTM, site name, separators) |
+| `seo_templates` | WP-style route rules (e.g. `/blog/*` maps to `%%post_title%% | %%sitetitle%%`) |
+| `seo_bulk_jobs` | Tracking status of automated crawler tasks |
+| `ai_keys` | Encrypted storage for OpenAI/Claude/Gemini API keys |
 | `ai_models` | AI provider configurations |
 | `seo_pages` | Pages being tracked |
 | `ai_audits` | Audit results (scores, issues) |
 | `seo_content` | Extracted page content |
 | `seo_suggestions` | AI-generated recommendations |
 | `blog_posts` | Blog content |
-| `schema_definitions` | Saved JSON-LD schemas |
-| `url_configurations` | URL optimization data |
+| `schema_definitions`| Saved JSON-LD schemas |
+| `url_configurations`| URL optimization data |
 
-Migration is at `supabase/migrations/20260311231129_create_ai_seo_tables.sql`.
+Migrations are located in `supabase/migrations/`.
+
+---
+
+## Template-Driven SEO
+
+Reacteo supports WordPress-style metadata templates. Instead of defining meta tags per page manually, define them in the centralized dashboard:
+
+- **Title Template**: `%%post_title%% %%sep%% %%sitetitle%%`
+- **Description**: `%%post_excerpt%%`
+
+During bulk processing or page rendering, the SEO Engine will dynamically inject these variables from your database content.
+
+### Smart AI Fallbacks
+If your content is missing metadata (e.g. no excerpt exists), enable **AI Fallbacks** on your template rule. The `seo-bulk-processor` will automatically analyze the page content and generate a high-converting meta description or alt text using OpenAI, Claude, or Gemini.
 
 ---
 

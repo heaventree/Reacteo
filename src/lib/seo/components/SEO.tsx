@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import type { SEOProps, OpenGraphImage } from '../types';
 import { useSEOContext } from '../context/SEOProvider';
+import { renderTemplate, renderSeoTemplates } from '../utils/template-engine';
 
 /**
  * SEO Component - Manages all meta tags and head elements
@@ -28,23 +29,36 @@ export const SEO: React.FC<SEOProps> = ({
   openGraph,
   twitter,
   jsonLd,
-  noindex = false,
   nofollow = false,
+  templateContext,
 }) => {
   const { config, isDevelopment } = useSEOContext();
 
-  // Format page title with app name
-  const formattedTitle = useMemo(() => {
-    if (!title) {
-      return config.appName;
-    }
-    return `${title} | ${config.appName}`;
-  }, [title, config.appName]);
+  const baseContext = useMemo(() => {
+    return {
+      sitetitle: config.appName,
+      sep: '|',
+      ...templateContext
+    };
+  }, [config.appName, templateContext]);
 
-  // Use provided description or config default
+  // Format page title with app name and template engine
+  const formattedTitle = useMemo(() => {
+    const rawTitle = title || '';
+    // If standard title provided with no templates, default to Title | AppName format
+    let finalTitle = rawTitle;
+    if (rawTitle && !rawTitle.includes('%%')) {
+      finalTitle = `${rawTitle} %%sep%% %%sitetitle%%`;
+    } else if (!rawTitle) {
+      finalTitle = `%%sitetitle%%`;
+    }
+    return renderTemplate(finalTitle, baseContext);
+  }, [title, baseContext]);
+
+  // Use provided description or config default with template engine
   const finalDescription = useMemo(() => {
-    return description || config.defaultDescription || '';
-  }, [description, config.defaultDescription]);
+    return renderTemplate(description || config.defaultDescription || '', baseContext);
+  }, [description, config.defaultDescription, baseContext]);
 
   // Determine canonical URL
   const finalCanonical = useMemo(() => {
@@ -56,8 +70,12 @@ export const SEO: React.FC<SEOProps> = ({
   }, [canonical, config.hostname]);
 
   // Build OpenGraph tags
+  const parsedOpenGraph = useMemo(() => {
+    return openGraph ? renderSeoTemplates(openGraph, baseContext) : openGraph;
+  }, [openGraph, baseContext]);
+
   const ogImage = useMemo(() => {
-    let image = openGraph?.image || config.defaultOGImage;
+    let image = parsedOpenGraph?.image || config.defaultOGImage;
     if (typeof image === 'string') {
       return image;
     }
@@ -65,7 +83,7 @@ export const SEO: React.FC<SEOProps> = ({
       return (image[0] as OpenGraphImage).url;
     }
     return config.defaultOGImage;
-  }, [openGraph?.image, config.defaultOGImage]);
+  }, [parsedOpenGraph?.image, config.defaultOGImage]);
 
   // Warn in development about missing critical metadata
   useMemo(() => {
@@ -115,14 +133,14 @@ export const SEO: React.FC<SEOProps> = ({
       <link rel="canonical" href={finalCanonical} />
 
       {/* OpenGraph Tags */}
-      <meta property="og:type" content={openGraph?.type || 'website'} />
-      <meta property="og:title" content={openGraph?.title || formattedTitle} />
-      <meta property="og:description" content={openGraph?.description || finalDescription} />
-      <meta property="og:url" content={openGraph?.url || finalCanonical} />
+      <meta property="og:type" content={parsedOpenGraph?.type || 'website'} />
+      <meta property="og:title" content={parsedOpenGraph?.title || formattedTitle} />
+      <meta property="og:description" content={parsedOpenGraph?.description || finalDescription} />
+      <meta property="og:url" content={parsedOpenGraph?.url || finalCanonical} />
       {ogImage && <meta property="og:image" content={ogImage} />}
-      {typeof openGraph?.image === 'object' &&
-        Array.isArray(openGraph.image) &&
-        openGraph.image.map((img: OpenGraphImage, index: number) => (
+      {typeof parsedOpenGraph?.image === 'object' &&
+        Array.isArray(parsedOpenGraph.image) &&
+        parsedOpenGraph.image.map((img: OpenGraphImage, index: number) => (
           <React.Fragment key={`og-image-${index}`}>
             <meta property="og:image" content={img.url} />
             {img.width && <meta property="og:image:width" content={img.width.toString()} />}
@@ -130,17 +148,17 @@ export const SEO: React.FC<SEOProps> = ({
             {img.alt && <meta property="og:image:alt" content={img.alt} />}
           </React.Fragment>
         ))}
-      {openGraph?.siteName && <meta property="og:site_name" content={openGraph.siteName} />}
-      {openGraph?.locale && <meta property="og:locale" content={openGraph.locale} />}
+      {parsedOpenGraph?.siteName && <meta property="og:site_name" content={parsedOpenGraph.siteName} />}
+      {parsedOpenGraph?.locale && <meta property="og:locale" content={parsedOpenGraph.locale} />}
 
       {/* Twitter Card Tags */}
       {twitter && (
         <>
           <meta name="twitter:card" content={twitter.card || 'summary'} />
-          {twitter.site && <meta name="twitter:site" content={twitter.site} />}
-          {twitter.creator && <meta name="twitter:creator" content={twitter.creator} />}
-          {twitter.title && <meta name="twitter:title" content={twitter.title} />}
-          {twitter.description && <meta name="twitter:description" content={twitter.description} />}
+          {twitter.site && <meta name="twitter:site" content={renderTemplate(twitter.site, baseContext)} />}
+          {twitter.creator && <meta name="twitter:creator" content={renderTemplate(twitter.creator, baseContext)} />}
+          {twitter.title && <meta name="twitter:title" content={renderTemplate(twitter.title, baseContext)} />}
+          {twitter.description && <meta name="twitter:description" content={renderTemplate(twitter.description, baseContext)} />}
           {twitter.image && <meta name="twitter:image" content={twitter.image} />}
         </>
       )}

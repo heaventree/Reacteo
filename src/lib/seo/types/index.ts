@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export interface OpenGraphProps {
   type?: 'website' | 'article' | 'product' | 'video' | 'music' | 'profile';
   url?: string;
@@ -41,6 +43,7 @@ export interface SEOProps {
   jsonLd?: SchemaOrg | SchemaOrg[];
   noindex?: boolean;
   nofollow?: boolean;
+  templateContext?: Record<string, any>;
 }
 
 export interface RouteMetadata {
