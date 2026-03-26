@@ -1,7 +1,7 @@
 {
   "name": "reacteo",
-  "version": "1.0.0",
-  "description": "AI-powered SEO system for React applications",
+  "version": "2.0.0",
+  "description": "Production-ready SEO library for React with server-side meta injection, client-side live sync, AI-powered content generation, and comprehensive admin tools. Battle-tested at niimo.io.",
   "private": false,
   "type": "module",
   "main": "./dist/lib/index.cjs",
@@ -12,21 +12,46 @@
       "import": "./dist/lib/index.js",
       "require": "./dist/lib/index.cjs",
       "types": "./dist/lib/index.d.ts"
+    },
+    "./plugin": {
+      "import": "./dist/lib/seo/reactseo-plugin/index.js",
+      "types": "./dist/lib/seo/reactseo-plugin/index.d.ts"
     }
   },
   "files": [
-    "dist/lib"
+    "dist/lib",
+    "README.md",
+    "INSTALLATION.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "keywords": [
     "react",
     "seo",
+    "meta-tags",
+    "open-graph",
+    "twitter-cards",
+    "structured-data",
+    "schema-org",
+    "json-ld",
+    "sitemap",
+    "robots-txt",
     "ai",
+    "openai",
+    "claude",
+    "gemini",
     "typescript",
     "supabase",
-    "open-graph",
-    "structured-data",
-    "sitemap",
-    "schema-org"
+    "server-side-rendering",
+    "ssr",
+    "crawler",
+    "social-sharing",
+    "metadata",
+    "react-helmet",
+    "indexnow",
+    "google-search-console",
+    "production",
+    "battle-tested"
   ],
   "author": "Sean O'Byrne <sean@heaventree.co> (https://heaventree.co)",
   "license": "MIT",

@@ -1,0 +1,73 @@
+Release v2.0.0: Production Plugin Integration from niimo.io
+
+Major release integrating battle-tested SEO implementation with server-side
+meta injection, client-side live sync, and comprehensive documentation.
+
+## New Features
+
+### Production Plugin (src/lib/seo/reactseo-plugin/)
+- Server-side meta injection for full crawler support
+- Client-side live sync on route changes  
+- Vite dev server integration
+- Production static server integration
+- Database seeding utilities
+- Complete implementation guide with all pitfalls solved
+
+### Enhanced Documentation
+- INSTALLATION.md - Three installation methods with step-by-step guides
+- MIGRATION_GUIDE.md - Upgrade paths from 1.x, custom setups, react-helmet
+- API_REFERENCE.md - Complete API documentation with examples
+- QUICK_START.md - Get plugin running in 15 minutes
+- Enhanced README with production focus
+
+### Improvements
+- Enhanced template engine with new variables
+- Additional structured data builders
+- Better error handling throughout
+- IndexNow integration
+- llm.txt generation support
+- Expanded package keywords and metadata
+
+## Breaking Changes
+
+- Database schema updates required (new tables and columns)
+- Edge Functions need redeployment
+- New package exports (backward compatible)
+
+See MIGRATION_GUIDE.md for detailed upgrade instructions.
+
+## Issues Solved
+
+✅ Crawlers receiving no meta tags (social previews blank)
+✅ Duplicate title and meta tags appearing
+✅ Catch-all routes intercepting API requests
+✅ Express wildcard pattern incompatibility
+✅ IndexNow key verification 404s
+✅ Meta tags not updating on client navigation
+✅ useSeoMeta called outside router context
+✅ Analytics scripts injected multiple times on HMR
+
+All solutions documented in REACTSEO_PLUGIN.md
+
+## Credits
+
+Special thanks to niimo.io team for battle-testing and sharing this
+production-proven implementation.
+
+## Files Changed
+
+New:
+- INSTALLATION.md
+- MIGRATION_GUIDE.md  
+- API_REFERENCE.md
+- REPOSITORY_UPDATE_SUMMARY.md
+- src/lib/seo/reactseo-plugin/* (complete plugin)
+
+Modified:
+- README.md (enhanced with production focus)
+- CHANGELOG.md (comprehensive 2.0.0 notes)
+- package.json (v2.0.0, enhanced metadata)
+- src/lib/seo/index.ts (additional exports)
+
+Version: 2.0.0
+Date: 2026-03-26

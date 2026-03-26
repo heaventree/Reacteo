@@ -3,57 +3,130 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://react.dev/)
+[![npm version](https://img.shields.io/npm/v/reacteo.svg)](https://www.npmjs.com/package/reacteo)
 
-An AI-powered SEO system for React applications. Manage template-driven metadata (like `%%post_title%%`), bulk AI generation, dynamic sitemaps, and audits from a single admin dashboard backed by [Supabase](https://supabase.com/).
+**Production-ready SEO library for React applications with full crawler support.**
+
+Battle-tested in production at [niimo.io](https://niimo.io). Reacteo provides server-side meta injection, client-side live sync, database-driven SEO management, AI-powered content generation, and comprehensive admin tools—all backed by [Supabase](https://supabase.com/).
+
+## Why Reacteo?
+
+React SPAs face a fundamental SEO challenge: crawlers don't execute JavaScript. Reacteo solves this with:
+
+- **Server-side meta injection** — Social crawlers (Twitter, Slack, LinkedIn) and search engines receive fully-populated `<title>`, `<meta>`, and Open Graph tags *before* JavaScript loads
+- **Client-side live sync** — React hooks automatically update metadata on route changes without page reloads
+- **Database-driven** — All SEO data stored in Supabase, editable from an admin dashboard
+- **AI-powered** — Bulk generate meta descriptions, audit content, and get optimization suggestions
+- **Production-proven** — Successfully deployed in production, solving all the common pitfalls
 
 ---
 
-## What's in here
+## Features
 
-### `src/lib/seo/` — The SEO library
+### Core SEO Features
+- ✅ **Server-side meta injection** for crawler compatibility
+- ✅ **Client-side live updates** on route changes
+- ✅ **Template-driven metadata** (WordPress-style `%%variables%%`)
+- ✅ **Structured data** (JSON-LD) with type-safe builders
+- ✅ **Dynamic sitemaps** (XML with pagination support)
+- ✅ **Robots.txt generation** with flexible rules
+- ✅ **Open Graph** and **Twitter Card** support
+- ✅ **Canonical URLs** and `noindex` control
+- ✅ **Image optimization** component with lazy loading
 
-The core of Reacteo. Zero dependencies beyond `react-helmet-async`.
+### AI-Powered Features
+- 🤖 **Bulk AI generation** of meta descriptions
+- 🤖 **Content audits** with SEO scoring (0-100)
+- 🤖 **AI suggestions** for optimization
+- 🤖 **Multi-provider support** (OpenAI, Claude, Gemini, Perplexity, Deepseek)
+- 🤖 **Smart fallbacks** when metadata is missing
 
-| File/Folder | What it does |
-|-------------|-------------|
-| `components/SEO.tsx` | Drop-in component for title, description, OG, Twitter, canonical, robots (supports templates) |
-| `admin/` | Dashboard UI components (`SettingsPanel`, `TemplateManager`, `BulkOperationsView`) |
-| `utils/template-engine.ts`| Parses WP-style tags like `%%post_title%%` and `%%sep%%` |
-| `utils/sitemap.ts` | Dynamic paginated XML sitemap generator for API routes |
-| `utils/robots.ts` | Dynamic robots.txt generator for API routes |
-| `context/SEOProvider.tsx`| Wraps `HelmetProvider`, provides site config via context |
-| `hooks/useSEO.ts` | Returns resolved `SEOProps` from context defaults — spread onto `<SEO>` |
-| `utils/schema.ts` | Typed JSON-LD builders: WebSite, Article, Breadcrumb, Product, LocalBusiness |
-| `types/index.ts` | All TypeScript types |
+### Admin Dashboard
+- 📊 **Visual admin panel** for all SEO settings
+- 📊 **Page discovery** and bulk operations
+- 📊 **Template manager** with preview
+- 📊 **Analytics integration** (GA4, GTM)
+- 📊 **IndexNow support** for instant indexing
+- 📊 **llm.txt** generation for AI crawlers
 
-This folder is self-contained. To use it in another project, copy `src/lib/seo/` and install `react-helmet-async`.
+### Production Plugin (`reactseo-plugin/`)
+- 🔌 **Express middleware** for server-side injection
+- 🔌 **React hooks** for client-side sync
+- 🔌 **Database schemas** for Supabase/PostgreSQL
+- 🔌 **API routes** reference implementation
+- 🔌 **Proven patterns** from production deployment
 
-### `src/lib/ai/` — The AI audit layer
+---
 
-Requires a live Supabase project with the three edge functions deployed. Without that, the AI features won't work. See [Prerequisites](#prerequisites).
+## Project Structure
 
-| File | What it does |
-|------|-------------|
-| `service.ts` | Routes requests to OpenAI, Gemini, Claude, Perplexity, or Deepseek |
-| `blog.ts` | Blog post CRUD via Supabase (`blog_posts`, `seo_pages` tables) |
-| `crawler.ts` | Fetches a URL and extracts headings, images, links, content |
-| `hooks.ts` | React hooks: `useAIAudit`, `useBlogPosts`, `usePageContent`, etc. |
+### `src/lib/seo/` — Core SEO Library
+
+The foundation of Reacteo. Minimal dependencies (only `react-helmet-async`).
+
+| File/Folder | Purpose |
+|-------------|---------|
+| `components/SEO.tsx` | Main component for metadata injection |
+| `components/Image.tsx` | Optimized image component with lazy loading |
+| `admin/` | Dashboard UI components |
+| `utils/template-engine.ts` | WordPress-style variable parsing |
+| `utils/sitemap.ts` | XML sitemap generator |
+| `utils/robots.ts` | Robots.txt generator |
+| `utils/schema.ts` | Type-safe JSON-LD builders |
+| `context/SEOProvider.tsx` | React context provider |
+| `hooks/useSEO.ts` | React hook for SEO data |
+| `types/index.ts` | TypeScript definitions |
+| `reactseo-plugin/` | **Production plugin** (see below) |
+
+### `src/lib/ai/` — AI Integration Layer
+
+Optional AI features powered by Supabase Edge Functions.
+
+| File | Purpose |
+|------|---------|
+| `service.ts` | Multi-provider AI routing (OpenAI, Claude, Gemini, etc.) |
+| `blog.ts` | Blog post management with SEO integration |
+| `crawler.ts` | URL content extraction and analysis |
+| `hooks.ts` | React hooks for AI features |
+
+### `src/lib/seo/reactseo-plugin/` — **Production Plugin** 🆕
+
+**Battle-tested implementation from [niimo.io](https://niimo.io)** — This plugin provides complete server-side and client-side SEO with proven solutions to common pitfalls.
+
+#### Server-side (`server/`)
+| File | Purpose |
+|------|---------|
+| `seo-inject.ts` | Server-side HTML `<head>` injection for crawlers |
+| `vite.ts` | Vite dev server integration |
+| `static.ts` | Production static server integration |
+| `seed-seo-pages.ts` | Initial page seeding |
+| `page-seed-data.ts` | Page metadata definitions |
+
+#### Client-side (`client/`)
+| File | Purpose |
+|------|---------|
+| `src/hooks/useSeoMeta.ts` | React hook for live meta updates on navigation |
+
+#### Documentation
+- `REACTSEO_PLUGIN.md` — Complete implementation guide with all the issues we encountered and how we fixed them
 
 ### `supabase/functions/` — Edge Functions
 
-| Function | What it does |
-|----------|-------------|
-| `seo-bulk-processor`| Background worker parsing templates & triggering AI for missing tags |
-| `seo-instant-indexing`| Pings Google & Bing APIs when pages update |
-| `ai-generate` | Proxies requests to whichever AI provider is configured |
-| `ai-models` | CRUD for AI model configs stored in Supabase |
-| `ai-audit` | Saves audit results to `ai_audits` and `seo_suggestions` tables |
+| Function | Purpose |
+|----------|---------|
+| `seo-bulk-processor` | Background job for template parsing and AI generation |
+| `seo-instant-indexing` | Google/Bing IndexNow API integration |
+| `ai-generate` | AI provider proxy with key management |
+| `ai-models` | AI model configuration CRUD |
+| `ai-audit` | SEO auditing and scoring engine |
 
-### `scripts/` — Build scripts
+### `scripts/` — Build Scripts
 
-- `generate-sitemap.js` — Post-build, generates `dist/sitemap.xml` from `seo-config.ts`
-- `generate-robots.js` — Post-build, generates `dist/robots.txt`
-- `seo-audit.js` — Pre-deploy checks: sitemap valid, robots.txt present, HTML exists
+| Script | Purpose |
+|--------|---------|
+| `generate-sitemap.ts` | Post-build sitemap generation |
+| `generate-robots.ts` | Post-build robots.txt generation |
+| `seo-audit.ts` | Pre-deploy SEO validation checks |
 
 ---
 
@@ -293,21 +366,55 @@ That's it. The SEO library has no other runtime dependencies.
 
 ---
 
+## Documentation
+
+- **[Installation Guide](./INSTALLATION.md)** — Complete setup instructions with three installation methods
+- **[Migration Guide](./MIGRATION_GUIDE.md)** — Upgrading from 1.x, custom setups, or react-helmet
+- **[API Reference](./API_REFERENCE.md)** — Complete API documentation for all exports
+- **[Production Plugin Guide](./src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md)** — Full implementation guide with solutions to all common pitfalls
+- **[Quick Start (Plugin)](./src/lib/seo/reactseo-plugin/QUICK_START.md)** — Get the plugin running in 15 minutes
+
+---
+
 ## Roadmap
 
-- [ ] Proper npm package with `exports` field (currently a template — copy `src/lib/seo/` to use in other projects)
-- [ ] Replace `vite-plugin-prerender` with a better-maintained alternative
+- [ ] npm package publication
 - [ ] Unit tests for schema builders and validation utils
 - [ ] AI audit fallback when Supabase is not configured
+- [ ] CDN distribution for direct browser usage
+- [ ] Video tutorials and example projects
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to contribute.
+
+---
+
+## Community & Support
+
+- **GitHub Issues**: [Report bugs](https://github.com/heaventree-ltd/reacteo/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/heaventree-ltd/reacteo/discussions)
+- **Email**: sean@heaventree.co
+- **Production Example**: [niimo.io](https://niimo.io) — See Reacteo in action
 
 ---
 
 ## License
 
-MIT — Copyright © 2024 Sean O'Byrne, Heaventree Ltd. See [LICENSE](./LICENSE).
+MIT — Copyright © 2024-2026 Sean O'Byrne, Heaventree Ltd.
+
+See [LICENSE](./LICENSE) for full license text.
+
+---
+
+## Acknowledgments
+
+Special thanks to the [niimo.io](https://niimo.io) team for battle-testing the production plugin and sharing the proven implementation patterns that make Reacteo production-ready.
+
+---
+
+**Ready to add production-grade SEO to your React app?**
+
+Get started with the [Installation Guide](./INSTALLATION.md) or jump straight to the [Quick Start](./src/lib/seo/reactseo-plugin/QUICK_START.md)!

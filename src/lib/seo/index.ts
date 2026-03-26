@@ -50,3 +50,23 @@ export type {
   ProductSchema,
   LocalBusinessSchema,
 } from './utils/schema';
+
+// Sitemap & Robots utilities
+export {
+  generateSitemap,
+  generateSitemapIndex,
+} from './utils/sitemap';
+
+export {
+  generateRobotsTxt,
+} from './utils/robots';
+
+// Template engine
+export {
+  processTemplate,
+} from './utils/template-engine';
+
+// Admin components (optional, can be imported individually)
+export { SettingsPanel } from './admin/SettingsPanel';
+export { TemplateManager } from './admin/TemplateManager';
+export { BulkOperationsView } from './admin/BulkOperationsView';
