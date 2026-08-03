@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import type { SEOProps, OpenGraphImage } from '../types';
+import type { SEOProps, OpenGraphImage, RobotsDirectives } from '../types';
 import { useSEOContext } from '../context/SEOProvider';
 import { renderTemplate, renderSeoTemplates } from '../utils/template-engine';
 
@@ -21,7 +21,7 @@ import { renderTemplate, renderSeoTemplates } from '../utils/template-engine';
  * />
  * ```
  */
-export const SEO: React.FC<SEOProps> = ({
+export const SEO = ({
   title,
   description,
   canonical,
@@ -29,9 +29,16 @@ export const SEO: React.FC<SEOProps> = ({
   openGraph,
   twitter,
   jsonLd,
+  noindex = false,
   nofollow = false,
   templateContext,
-}) => {
+  article,
+  alternates,
+  robots,
+  themeColor,
+  author,
+  feedUrl,
+}: SEOProps) => {
   const { config, isDevelopment } = useSEOContext();
 
   const baseContext = useMemo(() => {
@@ -75,7 +82,7 @@ export const SEO: React.FC<SEOProps> = ({
   }, [openGraph, baseContext]);
 
   const ogImage = useMemo(() => {
-    let image = parsedOpenGraph?.image || config.defaultOGImage;
+    const image = parsedOpenGraph?.image || config.defaultOGImage;
     if (typeof image === 'string') {
       return image;
     }
@@ -116,10 +123,40 @@ export const SEO: React.FC<SEOProps> = ({
 
   const robotsMeta = useMemo(() => {
     const parts: string[] = [];
-    if (noindex) parts.push('noindex');
-    if (nofollow) parts.push('nofollow');
-    return parts.length > 0 ? parts.join(',') : undefined;
-  }, [noindex, nofollow]);
+    parts.push(noindex ? 'noindex' : 'index');
+    parts.push(nofollow ? 'nofollow' : 'follow');
+
+    // Granular directives are meaningless on a page that is not indexed, so
+    // only emit them when the page is actually eligible to appear.
+    if (!noindex) {
+      const d: RobotsDirectives = robots ?? {};
+      // Default to the most permissive preview settings: answer engines and
+      // rich results require these to surface content at all, and the silent
+      // default (a ~160-char snippet, no large image) suppresses both.
+      parts.push(`max-snippet:${d.maxSnippet ?? -1}`);
+      parts.push(`max-image-preview:${d.maxImagePreview ?? 'large'}`);
+      parts.push(`max-video-preview:${d.maxVideoPreview ?? -1}`);
+      if (d.noarchive) parts.push('noarchive');
+      if (d.nositelinkssearchbox) parts.push('nositelinkssearchbox');
+      if (d.notranslate) parts.push('notranslate');
+      if (d.noimageindex) parts.push('noimageindex');
+      if (d.unavailableAfter) parts.push(`unavailable_after:${d.unavailableAfter}`);
+    }
+
+    return parts.join(', ');
+  }, [noindex, nofollow, robots]);
+
+  const articleAuthors = useMemo(() => {
+    if (!article?.author) return [];
+    return Array.isArray(article.author) ? article.author : [article.author];
+  }, [article?.author]);
+
+  const articleTags = useMemo(() => {
+    if (!article?.tag) return [];
+    return Array.isArray(article.tag) ? article.tag : [article.tag];
+  }, [article?.tag]);
+
+  const isArticle = (parsedOpenGraph?.type ?? 'website') === 'article';
 
   return (
     <Helmet>
@@ -129,8 +166,16 @@ export const SEO: React.FC<SEOProps> = ({
       {/* Standard Meta Tags */}
       <title>{formattedTitle}</title>
       <meta name="description" content={finalDescription} />
-      {robotsMeta && <meta name="robots" content={robotsMeta} />}
+      <meta name="robots" content={robotsMeta} />
       <link rel="canonical" href={finalCanonical} />
+      {author && <meta name="author" content={author} />}
+      {themeColor && <meta name="theme-color" content={themeColor} />}
+
+      {/* Alternate language versions */}
+      {alternates?.map((alt) => (
+        <link key={`alt-${alt.hreflang}`} rel="alternate" hrefLang={alt.hreflang} href={alt.href} />
+      ))}
+      {feedUrl && <link rel="alternate" type="application/rss+xml" href={feedUrl} />}
 
       {/* OpenGraph Tags */}
       <meta property="og:type" content={parsedOpenGraph?.type || 'website'} />
@@ -148,20 +193,51 @@ export const SEO: React.FC<SEOProps> = ({
             {img.alt && <meta property="og:image:alt" content={img.alt} />}
           </React.Fragment>
         ))}
-      {parsedOpenGraph?.siteName && <meta property="og:site_name" content={parsedOpenGraph.siteName} />}
+      <meta property="og:site_name" content={parsedOpenGraph?.siteName || config.appName} />
       {parsedOpenGraph?.locale && <meta property="og:locale" content={parsedOpenGraph.locale} />}
 
-      {/* Twitter Card Tags */}
-      {twitter && (
-        <>
-          <meta name="twitter:card" content={twitter.card || 'summary'} />
-          {twitter.site && <meta name="twitter:site" content={renderTemplate(twitter.site, baseContext)} />}
-          {twitter.creator && <meta name="twitter:creator" content={renderTemplate(twitter.creator, baseContext)} />}
-          {twitter.title && <meta name="twitter:title" content={renderTemplate(twitter.title, baseContext)} />}
-          {twitter.description && <meta name="twitter:description" content={renderTemplate(twitter.description, baseContext)} />}
-          {twitter.image && <meta name="twitter:image" content={twitter.image} />}
-        </>
+      {/* Article properties — freshness and authorship signals */}
+      {isArticle && article?.publishedTime && (
+        <meta property="article:published_time" content={article.publishedTime} />
       )}
+      {isArticle && article?.modifiedTime && (
+        <meta property="article:modified_time" content={article.modifiedTime} />
+      )}
+      {isArticle && article?.expirationTime && (
+        <meta property="article:expiration_time" content={article.expirationTime} />
+      )}
+      {isArticle && article?.section && <meta property="article:section" content={article.section} />}
+      {isArticle &&
+        articleAuthors.map((name, i) => (
+          <meta key={`article-author-${i}`} property="article:author" content={name} />
+        ))}
+      {isArticle &&
+        articleTags.map((tag, i) => (
+          <meta key={`article-tag-${i}`} property="article:tag" content={tag} />
+        ))}
+
+      {/* Twitter Card Tags — always emitted, falling back to the shared
+          title/description/image so cards render without extra configuration. */}
+      <meta
+        name="twitter:card"
+        content={twitter?.card || (ogImage ? 'summary_large_image' : 'summary')}
+      />
+      {twitter?.site && <meta name="twitter:site" content={renderTemplate(twitter.site, baseContext)} />}
+      {twitter?.creator && <meta name="twitter:creator" content={renderTemplate(twitter.creator, baseContext)} />}
+      <meta
+        name="twitter:title"
+        content={twitter?.title ? renderTemplate(twitter.title, baseContext) : formattedTitle}
+      />
+      <meta
+        name="twitter:description"
+        content={
+          twitter?.description ? renderTemplate(twitter.description, baseContext) : finalDescription
+        }
+      />
+      {(twitter?.image || ogImage) && (
+        <meta name="twitter:image" content={twitter?.image || ogImage} />
+      )}
+      {twitter?.imageAlt && <meta name="twitter:image:alt" content={twitter.imageAlt} />}
 
       {/* JSON-LD Structured Data */}
       {jsonLdArray &&

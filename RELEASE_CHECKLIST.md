@@ -33,7 +33,7 @@ Pre-release verification checklist for Reacteo 2.0.0
 
 ## Code Changes ✅
 
-- [x] Plugin files extracted to src/lib/seo/reactseo-plugin/
+- [x] Server-side injection helpers live in src/lib/seo/ssr/
 - [x] Plugin index.ts created with exports
 - [x] Main lib index.ts enhanced with utilities
 - [x] Server-side injection implementation (seo-inject.ts)
@@ -147,7 +147,6 @@ All solutions documented in REACTSEO_PLUGIN.md ✅
 - [ ] Release notes from CHANGELOG.md
 - [ ] Highlight production plugin
 - [ ] Link to documentation
-- [ ] Credit niimo.io
 
 ---
 
@@ -240,7 +239,7 @@ All critical documentation completed, plugin integrated, and core functionality 
 
 - [x] Documentation complete and comprehensive
 - [x] Code changes integrated and working
-- [x] Plugin proven in production (niimo.io)
+- [x] Server-side injection helpers covered by the public API
 - [x] Breaking changes documented
 - [x] Migration paths clear
 - [x] Repository ready for 2.0.0 release

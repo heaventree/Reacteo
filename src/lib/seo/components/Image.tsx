@@ -75,7 +75,7 @@ export const Image = React.forwardRef<HTMLImageElement, ImageProps>(
       });
 
       return srcSetParts.join(', ');
-    }, [src, width]);
+    }, [src, width, height]);
 
     // Build picture element with format negotiation
     const buildPictureElement = useCallback(() => {
@@ -138,7 +138,7 @@ export const Image = React.forwardRef<HTMLImageElement, ImageProps>(
           />
         </picture>
       );
-    }, [src, alt, width, height, priority, srcSet, sizes, className, onError, formats, ref]);
+    }, [src, alt, width, height, priority, srcSet, sizes, className, onError, formats, ref, props]);
 
     // If formats requested, use picture element; otherwise use simple img
     if (formats && formats.length > 0) {

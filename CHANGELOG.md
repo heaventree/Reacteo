@@ -21,11 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🎉 Major Release: Production Plugin Integration
 
-This release integrates the battle-tested SEO implementation from [niimo.io](https://niimo.io), providing production-ready server-side rendering and client-side synchronization.
+This release adds server-side rendering and client-side synchronization support.
 
 ### Added
 
-#### Production Plugin (`src/lib/seo/reactseo-plugin/`)
+#### Server-side rendering (`src/lib/seo/ssr/`)
 - **Server-side meta injection** (`seo-inject.ts`) — Crawlers receive fully-populated meta tags before JavaScript executes
 - **Vite dev server integration** (`vite.ts`) — Server-side injection during development
 - **Production static server** (`static.ts`) — Express middleware for production deployments
@@ -105,10 +105,6 @@ See [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for detailed upgrade instructions
 - **React** — >=17.0.0 (unchanged)
 - **TypeScript** — >=5.0 (recommended)
 - **Supabase** — Latest stable version
-
-### Credits
-
-Special thanks to the [niimo.io](https://niimo.io) team for battle-testing this implementation in production and sharing the proven patterns.
 
 ---
 

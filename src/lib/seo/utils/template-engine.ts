@@ -20,8 +20,9 @@ export interface TemplateContext {
   post_author?: string;
   category?: string;
   
-  // Allow any other custom tag
-  [key: string]: string | undefined;
+  // Allow any other custom tag. Non-string scalars are accepted and coerced
+  // via String() at render time, so callers need not pre-format numbers/dates.
+  [key: string]: string | number | boolean | undefined;
 }
 
 export const defaultTemplateContext: TemplateContext = {
@@ -47,7 +48,7 @@ export function renderTemplate(template: string | undefined, context: TemplateCo
   // Find all %%tags%%
   const regex = /%%([a-zA-Z0-9_]+)%%/g;
   
-  result = result.replace(regex, (match, tag) => {
+  result = result.replace(regex, (_match, tag) => {
     const value = mergedContext[tag];
     return value !== undefined && value !== null ? String(value) : '';
   });
@@ -72,22 +73,24 @@ export function renderTemplate(template: string | undefined, context: TemplateCo
 /**
  * Processes an entire object of SEO templates (e.g. title, description), rendering them string by string.
  */
-export function renderSeoTemplates<T extends Record<string, any>>(templates: T, context: TemplateContext): T {
-  const rendered: any = { ...templates };
-  
-  for (const key in rendered) {
-    if (Object.prototype.hasOwnProperty.call(rendered, key)) {
-      if (key === '__proto__' || key === 'constructor') continue;
+export function renderSeoTemplates<T extends object>(
+  templates: T,
+  context: TemplateContext
+): T {
+  const rendered = { ...templates } as Record<string, unknown>;
 
-      if (typeof rendered[key] === 'string') {
-        rendered[key] = renderTemplate(rendered[key], context);
-      } else if (typeof rendered[key] === 'object' && rendered[key] !== null) {
-        if (!Array.isArray(rendered[key])) {
-           rendered[key] = renderSeoTemplates(rendered[key], context);
-        }
-      }
+  for (const key of Object.keys(rendered)) {
+    // Skip prototype-polluting keys rather than walking into them.
+    if (key === '__proto__' || key === 'constructor') continue;
+
+    const value = rendered[key];
+
+    if (typeof value === 'string') {
+      rendered[key] = renderTemplate(value, context);
+    } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      rendered[key] = renderSeoTemplates(value as Record<string, unknown>, context);
     }
   }
-  
+
   return rendered as T;
 }

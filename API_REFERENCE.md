@@ -980,7 +980,7 @@ function BlogPost({ post }) {
 
 - [Installation Guide](./INSTALLATION.md)
 - [Migration Guide](./MIGRATION_GUIDE.md)
-- [Production Plugin Guide](./src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md)
+- [Installation Guide](./INSTALLATION.md)
 - [Contributing Guide](./CONTRIBUTING.md)
 
 ---

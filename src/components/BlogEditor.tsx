@@ -36,21 +36,26 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ slug, onSave }) => {
     }
   }, [post]);
 
-  const handleFieldChange = (field: keyof BlogPost, value: any) => {
+  // Generic over the field so `value` is narrowed to that field's own type,
+  // which is what lets the `title`/`content` branches below treat it as a
+  // string without a cast.
+  const handleFieldChange = <K extends keyof BlogPost>(field: K, value: BlogPost[K]) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
 
-    // Auto-update slugs and counts
-    if (field === 'title' && !slug) {
+    // Auto-update slugs and counts. The `typeof` guards do the narrowing that
+    // comparing `field` cannot: TypeScript will not infer `BlogPost[K]` from a
+    // literal check on `field`.
+    if (field === 'title' && !slug && typeof value === 'string') {
       setFormData((prev) => ({
         ...prev,
         slug: BlogService.slugify(value),
       }));
     }
 
-    if (field === 'content') {
+    if (field === 'content' && typeof value === 'string') {
       const wordCount = BlogService.calculateWordCount(value);
       const readingTime = BlogService.calculateReadingTime(value);
       setFormData((prev) => ({

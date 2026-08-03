@@ -71,6 +71,10 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({ config, children }) =>
  * useSEOContext - Hook to access SEO context values
  * @internal Use useSEO() for SEO data injection instead
  */
+// Co-located with the provider deliberately: the hook and the context it reads
+// are one unit, and splitting them apart to satisfy Fast Refresh would only
+// move the coupling. The cost is a full reload when this file is edited.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSEOContext = (): SEOContextType => {
   const context = useContext(SEOContext);
   if (!context) {

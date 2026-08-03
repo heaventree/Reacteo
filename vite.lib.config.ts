@@ -6,14 +6,30 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/lib/seo/index.ts'),
+      // Two entries: the default one is browser-safe, `server` carries the
+      // Node-only sitemap generator.
+      entry: {
+        index: resolve(__dirname, 'src/lib/seo/index.ts'),
+        server: resolve(__dirname, 'src/lib/seo/server.ts'),
+      },
       name: 'Reacteo',
       formats: ['es', 'cjs'],
-      fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
+      fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
     },
     outDir: 'dist/lib',
     rollupOptions: {
-      external: ['react', 'react-dom', 'react-helmet-async', 'react/jsx-runtime'],
+      // Peers and runtime dependencies stay external so consumers resolve a
+      // single copy — bundling react-helmet-async in particular would give the
+      // library its own HelmetProvider context and silently drop head tags.
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react-helmet-async',
+        'sitemap',
+        '@supabase/supabase-js',
+        'lucide-react',
+      ],
       output: {
         globals: {
           react: 'React',
