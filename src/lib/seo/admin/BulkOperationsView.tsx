@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayCircle, AlertCircle, CheckCircle2, Search, FileText, Image as ImageIcon, Bot, Filter } from 'lucide-react';
+import { PlayCircle, AlertCircle, CheckCircle2, Search, Image as ImageIcon, Bot, Filter } from 'lucide-react';
 
 export interface SeoPageRecord {
   id: string;
@@ -30,6 +30,14 @@ export const BulkOperationsView: React.FC<BulkOperationsViewProps> = ({
   onRunAudit,
   onRunAiGeneration
 }) => {
+  // The page size is inferred from the current slice rather than passed in, so
+  // the control stays correct regardless of how the caller paginates. It falls
+  // back to the total when a single slice holds everything.
+  const pageSize = pages.length || totalCount || 1;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const rangeStart = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(currentPage * pageSize, totalCount);
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -205,12 +213,33 @@ export const BulkOperationsView: React.FC<BulkOperationsViewProps> = ({
           </table>
         </div>
         
-        {/* Pagination placeholder */}
+        {/* Pagination */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-sm text-slate-500">
-          <div>Showing 1 - {pages.length} of {totalCount}</div>
-          <div className="flex gap-2">
-            <button className="px-3 py-1 border rounded hover:bg-slate-50">Previous</button>
-            <button className="px-3 py-1 border rounded hover:bg-slate-50">Next</button>
+          <div>
+            {pages.length > 0
+              ? `Showing ${rangeStart} - ${rangeEnd} of ${totalCount.toLocaleString()}`
+              : `No pages to show`}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="px-3 py-1 border rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className="px-3 py-1 border rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>

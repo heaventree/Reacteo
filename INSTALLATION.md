@@ -186,7 +186,7 @@ function App() {
 
 ### Method 3: Production Plugin Only
 
-Use the battle-tested production plugin from niimo.io for server-side rendering.
+Use the server-side meta injection helpers for crawlers that do not execute JavaScript.
 
 #### Step 1: Copy Plugin Files
 
@@ -195,7 +195,7 @@ your-project/
 └── src/
     └── lib/
         └── seo/
-            └── reactseo-plugin/
+            └── ssr/
                 ├── server/
                 ├── client/
                 └── REACTSEO_PLUGIN.md
@@ -203,7 +203,7 @@ your-project/
 
 #### Step 2: Follow Plugin Guide
 
-See [`src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md`](./src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md) for complete integration instructions.
+See the [API Reference](./API_REFERENCE.md) for complete integration instructions.
 
 The plugin includes:
 - Server-side meta injection
@@ -459,14 +459,14 @@ For production deployments with server-side rendering, integrate the ReactSEO pl
 
 ### Express + Vite Setup
 
-See the complete guide in [`src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md`](./src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md).
+See the complete guide in the [API Reference](./API_REFERENCE.md).
 
 **Key highlights:**
 
 1. **Server-side injection** ensures crawlers get fully-populated meta tags
 2. **Client-side hook** syncs meta on route changes
 3. **Proven patterns** solve all common pitfalls
-4. **Production-tested** at niimo.io
+4. **Framework-agnostic** — no database, router, or server framework required
 
 ---
 
@@ -600,7 +600,7 @@ After installation:
 
 - [API Reference](./API_REFERENCE.md) - Complete API documentation
 - [Migration Guide](./MIGRATION_GUIDE.md) - Upgrading from older versions
-- [ReactSEO Plugin Guide](./src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md) - Production plugin implementation
+- [API Reference](./API_REFERENCE.md) - Full API surface, including server-side injection
 - [Contributing Guide](./CONTRIBUTING.md) - How to contribute
 - [Changelog](./CHANGELOG.md) - Version history
 

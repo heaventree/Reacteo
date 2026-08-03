@@ -1,4 +1,5 @@
 import type React from 'react';
+import type { TemplateContext } from '../utils/template-engine';
 
 export interface OpenGraphProps {
   type?: 'website' | 'article' | 'product' | 'video' | 'music' | 'profile';
@@ -25,12 +26,50 @@ export interface TwitterCardProps {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
+}
+
+/**
+ * Open Graph `article:*` properties. Emitted when `openGraph.type` is
+ * `'article'`. Publication dates double as freshness signals for answer
+ * engines, which weight recency when selecting citation sources.
+ */
+export interface OpenGraphArticle {
+  publishedTime?: string;
+  modifiedTime?: string;
+  expirationTime?: string;
+  author?: string | string[];
+  section?: string;
+  tag?: string | string[];
+}
+
+/** A single `<link rel="alternate" hreflang="...">` entry. */
+export interface AlternateLink {
+  hreflang: string;
+  href: string;
+}
+
+/**
+ * Granular `robots` directives. Beyond index/follow, these control how much
+ * of a page search and answer engines may surface — `maxSnippet: -1` and
+ * `maxImagePreview: 'large'` are effectively required for rich results and
+ * for inclusion in AI-generated answers.
+ */
+export interface RobotsDirectives {
+  maxSnippet?: number;
+  maxImagePreview?: 'none' | 'standard' | 'large';
+  maxVideoPreview?: number;
+  noarchive?: boolean;
+  nositelinkssearchbox?: boolean;
+  notranslate?: boolean;
+  noimageindex?: boolean;
+  unavailableAfter?: string;
 }
 
 export interface SchemaOrg {
   '@context'?: string;
   '@type': string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface SEOProps {
@@ -43,7 +82,19 @@ export interface SEOProps {
   jsonLd?: SchemaOrg | SchemaOrg[];
   noindex?: boolean;
   nofollow?: boolean;
-  templateContext?: Record<string, any>;
+  templateContext?: TemplateContext;
+  /** `article:*` Open Graph properties; only emitted for `openGraph.type === 'article'`. */
+  article?: OpenGraphArticle;
+  /** `<link rel="alternate" hreflang>` entries for multi-locale sites. */
+  alternates?: AlternateLink[];
+  /** Granular robots directives (snippet length, image preview size, etc.). */
+  robots?: RobotsDirectives;
+  /** Browser UI theme colour (`<meta name="theme-color">`). */
+  themeColor?: string;
+  /** Author name, emitted as `<meta name="author">` — an E-E-A-T signal. */
+  author?: string;
+  /** Overrides the `<link rel="alternate">` RSS/Atom feed URL. */
+  feedUrl?: string;
 }
 
 export interface RouteMetadata {
@@ -76,7 +127,7 @@ export interface SEOConfig {
 }
 
 export interface PreloadedState {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ImageProps

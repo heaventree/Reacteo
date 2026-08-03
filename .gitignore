@@ -21,3 +21,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Vite writes these transient config timestamps next to vite.config.ts
+vite.config.ts.timestamp-*
+vite.config.js.timestamp-*

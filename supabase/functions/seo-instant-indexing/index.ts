@@ -47,8 +47,8 @@ serve(async (req) => {
         } else {
           results.bing = { status: 'error', message: await bingRes.text() };
         }
-      } catch (e: any) {
-        results.bing = { status: 'error', message: e.message };
+      } catch (e) {
+        results.bing = { status: 'error', message: e instanceof Error ? e.message : String(e) };
       }
     } else {
       results.bing = { status: 'skipped', message: 'No BING_API_KEY configured' };
@@ -66,8 +66,8 @@ serve(async (req) => {
          // Placeholder for JWT Google Auth and Fetch to https://indexing.googleapis.com/v3/urlNotifications:publish
          // ...
          results.google = { status: 'success', message: 'Simulated Indexing API Ping' };
-      } catch (e: any) {
-         results.google = { status: 'error', message: e.message };
+      } catch (e) {
+         results.google = { status: 'error', message: e instanceof Error ? e.message : String(e) };
       }
     } else {
       results.google = { status: 'skipped', message: 'No GOOGLE_SERVICE_ACCOUNT_CREDENTIALS configured' };
@@ -78,9 +78,10 @@ serve(async (req) => {
       { headers: { 'Content-Type': 'application/json' }, status: 200 }
     );
 
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    const message = err instanceof Error ? err.message : String(err);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

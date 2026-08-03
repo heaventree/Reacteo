@@ -1,6 +1,6 @@
 # Reacteo Migration Guide
 
-Guide for upgrading to Reacteo 2.0 with the production plugin from niimo.io.
+Guide for upgrading to Reacteo 2.0.
 
 ---
 
@@ -22,7 +22,7 @@ Guide for upgrading to Reacteo 2.0 with the production plugin from niimo.io.
 
 ### 🆕 Production Plugin
 
-Battle-tested implementation from [niimo.io](https://niimo.io) with:
+Server-side rendering support with:
 - **Server-side meta injection** for full crawler support
 - **Client-side live sync** for SPA navigation
 - **Proven solutions** to all common SEO pitfalls
@@ -260,7 +260,7 @@ Build script auto-generates `dist/sitemap.xml`.
 
 For production crawler support, integrate the production plugin:
 
-See [`src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md`](./src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md)
+See the [API Reference](./API_REFERENCE.md)
 
 ---
 
@@ -561,7 +561,7 @@ supabase db execute < supabase/migrations/failed-migration.sql
 1. ✅ Check this migration guide
 2. ✅ Review [INSTALLATION.md](./INSTALLATION.md)
 3. ✅ Check [API_REFERENCE.md](./API_REFERENCE.md)
-4. ✅ Review plugin docs: [`REACTSEO_PLUGIN.md`](./src/lib/seo/reactseo-plugin/REACTSEO_PLUGIN.md)
+4. ✅ Review the [API Reference](./API_REFERENCE.md)
 5. ✅ Check existing GitHub issues
 
 ### Support Channels
