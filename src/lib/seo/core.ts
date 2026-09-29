@@ -28,6 +28,7 @@ export { SEO } from './components/SEO';
 export { SEOProvider, useSEOContext } from './context/SEOProvider';
 
 export { injectSeoMeta, buildMetaTags } from './ssr/inject-meta';
+export { syncSeoMeta } from './client/sync-head';
 export type { InjectableMeta, InjectSeoMetaOptions } from './ssr/inject-meta';
 
 export { generateRobotsTxt } from './utils/robots';

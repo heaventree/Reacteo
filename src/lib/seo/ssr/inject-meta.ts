@@ -87,12 +87,14 @@ function serializeJsonLd(schema: SchemaOrg): string {
  */
 function stripExistingTags(html: string): string {
   return html
-    .replace(/<title>[\s\S]*?<\/title>/gi, '')
+    .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
     .replace(
       /<meta\s+[^>]*(?:name|property)\s*=\s*["'](?:description|robots|author|google-site-verification|msvalidate\.01|og:[^"']*|twitter:[^"']*|article:[^"']*)["'][^>]*>/gi,
       ''
     )
-    .replace(/<link\s+[^>]*rel\s*=\s*["']canonical["'][^>]*>/gi, '');
+    .replace(/<link\s+[^>]*rel\s*=\s*["']canonical["'][^>]*>/gi, '')
+    .replace(/<link\s+[^>]*data-reacteo[^>]*>/gi, '')
+    .replace(/<script\s+[^>]*data-reacteo[^>]*>[\s\S]*?<\/script>/gi, '');
 }
 
 /** Renders the head tags for a metadata object, without injecting them. */
@@ -190,7 +192,8 @@ export function buildMetaTags(meta: InjectableMeta): string {
     }
   }
 
-  return tags.join('\n    ');
+  // Marker so the browser can find and replace exactly these tags on route changes.
+  return tags.map((tag) => tag.replace(/^<(\w+)/, '<$1 data-reacteo')).join('\n    ');
 }
 
 export interface InjectSeoMetaOptions {
