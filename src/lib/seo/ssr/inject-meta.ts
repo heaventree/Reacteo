@@ -43,6 +43,11 @@ export interface InjectableMeta {
   alternates?: Array<{ hreflang: string; href: string }>;
   /** JSON-LD emitted as `<script type="application/ld+json">` blocks. */
   jsonLd?: SchemaOrg | SchemaOrg[];
+  /**
+   * Site-ownership verification tokens, emitted as
+   * `<meta name="google-site-verification">` / `<meta name="msvalidate.01">`.
+   */
+  verification?: { google?: string; bing?: string };
 }
 
 /** Escapes text destined for a double-quoted HTML attribute. */
@@ -84,7 +89,7 @@ function stripExistingTags(html: string): string {
   return html
     .replace(/<title>[\s\S]*?<\/title>/gi, '')
     .replace(
-      /<meta\s+[^>]*(?:name|property)\s*=\s*["'](?:description|robots|author|og:[^"']*|twitter:[^"']*|article:[^"']*)["'][^>]*>/gi,
+      /<meta\s+[^>]*(?:name|property)\s*=\s*["'](?:description|robots|author|google-site-verification|msvalidate\.01|og:[^"']*|twitter:[^"']*|article:[^"']*)["'][^>]*>/gi,
       ''
     )
     .replace(/<link\s+[^>]*rel\s*=\s*["']canonical["'][^>]*>/gi, '');
@@ -169,6 +174,13 @@ export function buildMetaTags(meta: InjectableMeta): string {
     if (meta.ogImageAlt) {
       push(`<meta name="twitter:image:alt" content="${escapeAttribute(meta.ogImageAlt)}">`);
     }
+  }
+
+  if (meta.verification?.google) {
+    push(`<meta name="google-site-verification" content="${escapeAttribute(meta.verification.google)}">`);
+  }
+  if (meta.verification?.bing) {
+    push(`<meta name="msvalidate.01" content="${escapeAttribute(meta.verification.bing)}">`);
   }
 
   if (meta.jsonLd) {

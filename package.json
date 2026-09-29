@@ -18,6 +18,11 @@
       "import": "./dist/lib/server.js",
       "require": "./dist/lib/server.cjs"
     },
+    "./core": {
+      "types": "./dist/lib/core.d.ts",
+      "import": "./dist/lib/core.js",
+      "require": "./dist/lib/core.cjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [

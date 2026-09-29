@@ -147,6 +147,32 @@ allowing search and user-initiated agents, which cite and link back.
 
 ---
 
+## Code-driven SEO (no database, no admin)
+
+For sites that keep SEO in the repository, use the lean `reacteo/core` entry. Define every page once and the registry derives everything that has to agree with it:
+
+```ts
+import { createSeoRegistry, injectSeoMeta } from 'reacteo/core';
+
+export const seo = createSeoRegistry({
+  name: 'Acme',
+  hostname: 'https://acme.example',
+  titleTemplate: '%s | Acme',
+  verification: { google: '<search-console-token>' },
+  pages: [
+    { path: '/', title: 'Acme — Widgets', rawTitle: true, description: '…', priority: 1 },
+    { path: '/blog/hello', title: 'Hello', description: '…', article: { publishedTime: '2026-01-01' } },
+  ],
+});
+
+app.get('*', (req, res) => res.send(injectSeoMeta(template, seo.meta(req.path))));
+seo.sitemapXml(); seo.robotsTxt({ aiCrawlers: true }); seo.llmsTxt(); seo.audit();
+```
+
+On the client, `<SEO {...seo.seoProps(path)} />` keeps the head in sync on route changes.
+
+---
+
 ## Quick start
 
 ### Prerequisites

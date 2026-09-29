@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `reacteo/core`: a lean entry point with no Supabase client, admin UI, icon library or `sitemap` package.
+- `createSeoRegistry()`: define pages once in code and derive per-route head metadata (client `<SEO>` props and server `injectSeoMeta` input), a linked JSON-LD `@graph` (Organization, WebSite, WebPage, BreadcrumbList, BlogPosting, WebApplication, FAQPage), `sitemap.xml`, `robots.txt`, `llms.txt` and a metadata audit.
+- `verification` on `InjectableMeta` and the registry for Google Search Console and Bing Webmaster ownership tags.
+
+## [Unreleased]
+
 ### Planned
 - Unit tests for schema builders and validation utils
 - AI audit fallback UI when Supabase is not configured

@@ -6,11 +6,13 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      // Two entries: the default one is browser-safe, `server` carries the
-      // Node-only sitemap generator.
+      // Three entries: the default one is browser-safe, `server` carries the
+      // Node-only sitemap generator, `core` is the lean code-driven surface
+      // (no Supabase, admin UI or sitemap package).
       entry: {
         index: resolve(__dirname, 'src/lib/seo/index.ts'),
         server: resolve(__dirname, 'src/lib/seo/server.ts'),
+        core: resolve(__dirname, 'src/lib/seo/core.ts'),
       },
       name: 'Reacteo',
       formats: ['es', 'cjs'],
