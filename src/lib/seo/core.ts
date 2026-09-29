@@ -6,8 +6,10 @@
  * that keep their SEO in code (see `createSeoRegistry`) rather than in a
  * database.
  *
- * `SEO` and `SEOProvider` need `react` and `react-helmet-async`; everything
- * else is dependency-free.
+ * Fully dependency-free: no React, no Helmet. The head is written by
+ * `injectSeoMeta` on the server and kept in sync in the browser by
+ * `syncSeoMeta`, which uses the same generator. (The Helmet-based `SEO`
+ * component remains in the main entry for database-driven sites.)
  */
 
 export { createSeoRegistry, normalizePath } from './registry';
@@ -23,9 +25,6 @@ export type {
   PageSchemaType,
   ChangeFreq,
 } from './registry';
-
-export { SEO } from './components/SEO';
-export { SEOProvider, useSEOContext } from './context/SEOProvider';
 
 export { injectSeoMeta, buildMetaTags } from './ssr/inject-meta';
 export { syncSeoMeta } from './client/sync-head';
