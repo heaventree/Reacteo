@@ -116,6 +116,15 @@ export interface SitemapEntry {
   }>;
 }
 
+/** Search-engine site-verification meta tags (SEOPress/LV SEO parity). */
+export interface VerificationTags {
+  google?: string;
+  bing?: string;
+  yandex?: string;
+  pinterest?: string;
+  facebook?: string;
+}
+
 export interface SEOConfig {
   hostname: string;
   appName: string;
@@ -124,6 +133,16 @@ export interface SEOConfig {
   defaultOGImage?: string;
   routes: RouteMetadata[];
   environment?: 'development' | 'staging' | 'production';
+  /** Site-verification meta tags, applied on every page. */
+  verification?: VerificationTags;
+  /**
+   * Forces `noindex, nofollow` on every page regardless of per-page
+   * settings — the site-wide "discourage search engines" switch. Read
+   * this from `discourage_hostname` in `seo_global_settings` matching the
+   * live hostname, not a raw boolean, so a copied database can't silently
+   * carry it into production.
+   */
+  discourageSearchEngines?: boolean;
 }
 
 export interface PreloadedState {

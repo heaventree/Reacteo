@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Key, Globe } from 'lucide-react';
+import { Save, Key, Globe, EyeOff } from 'lucide-react';
 
 export interface GlobalSettings {
   site_name: string;
@@ -7,6 +7,21 @@ export interface GlobalSettings {
   ga4_id: string;
   gtm_id: string;
   gsc_verification: string;
+  /** Bing Webmaster Tools site verification meta content. */
+  bing_verification: string;
+  /** Yandex Webmaster site verification meta content. */
+  yandex_verification: string;
+  /** Pinterest domain verification meta content. */
+  pinterest_verification: string;
+  /** Facebook domain verification meta content. */
+  facebook_verification: string;
+  /**
+   * Site-wide "discourage search engines" — forces noindex,nofollow on
+   * every page regardless of per-page settings. Bound to the hostname it
+   * was enabled for (see settings-service) so a database copied from a
+   * staging site can't silently carry this into production.
+   */
+  discourage_search_engines: boolean;
 }
 
 export interface AiKey {
@@ -33,6 +48,11 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     ga4_id: '',
     gtm_id: '',
     gsc_verification: '',
+    bing_verification: '',
+    yandex_verification: '',
+    pinterest_verification: '',
+    facebook_verification: '',
+    discourage_search_engines: false,
     ...initialSettings,
   });
 
@@ -131,6 +151,75 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 placeholder="e.g. google1234567890abcdef.html or meta tag content hash"
               />
             </div>
+          </div>
+
+          {/* Remaining search-engine verification tags — SEOPress/LV SEO parity:
+              Google alone was covered before this. */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Bing Webmaster Verification</label>
+              <input
+                type="text"
+                value={settings.bing_verification}
+                onChange={(e) => setSettings({ ...settings, bing_verification: e.target.value })}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="meta tag content value"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Yandex Webmaster Verification</label>
+              <input
+                type="text"
+                value={settings.yandex_verification}
+                onChange={(e) => setSettings({ ...settings, yandex_verification: e.target.value })}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="meta tag content value"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Pinterest Domain Verification</label>
+              <input
+                type="text"
+                value={settings.pinterest_verification}
+                onChange={(e) => setSettings({ ...settings, pinterest_verification: e.target.value })}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="meta tag content value"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Facebook Domain Verification</label>
+              <input
+                type="text"
+                value={settings.facebook_verification}
+                onChange={(e) => setSettings({ ...settings, facebook_verification: e.target.value })}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="meta tag content value"
+              />
+            </div>
+          </div>
+
+          {/* Site-wide discourage toggle */}
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.discourage_search_engines}
+                onChange={(e) =>
+                  setSettings({ ...settings, discourage_search_engines: e.target.checked })
+                }
+                className="mt-1 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="flex items-start gap-2">
+                <EyeOff className="w-4 h-4 mt-0.5 text-amber-500 flex-shrink-0" />
+                <span className="text-sm text-slate-700 dark:text-slate-300">
+                  <span className="font-medium">Discourage search engines from indexing this site</span>
+                  <br />
+                  Forces <code>noindex, nofollow</code> on every page regardless of per-page
+                  settings. Use only on staging — bound to this hostname, so it cannot
+                  silently follow a database copy into production.
+                </span>
+              </span>
+            </label>
           </div>
 
           <div className="flex justify-end">

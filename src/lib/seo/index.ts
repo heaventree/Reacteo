@@ -25,6 +25,7 @@ export type {
   PreloadedState,
   BreadcrumbProps,
   BreadcrumbItem,
+  VerificationTags,
 } from './types';
 
 // Utilities
@@ -112,7 +113,29 @@ export { renderTemplate, renderSeoTemplates, defaultTemplateContext } from './ut
 
 export type { TemplateContext } from './utils/template-engine';
 
+// Redirects — framework-agnostic matching/normalisation, usable from a
+// React Router guard or a Node server's middleware alike.
+export { normalizeRedirectPath, resolveRedirect } from './utils/redirects';
+
+export type { RedirectRule } from './utils/redirects';
+
 // Admin components (optional, can be imported individually)
 export { SettingsPanel } from './admin/SettingsPanel';
+export type { GlobalSettings, AiKey } from './admin/SettingsPanel';
 export { TemplateManager } from './admin/TemplateManager';
 export { BulkOperationsView } from './admin/BulkOperationsView';
+export { RedirectsPanel } from './admin/RedirectsPanel';
+export type { RedirectRow } from './admin/RedirectsPanel';
+
+// Supabase-backed persistence for the admin panels above. Each service owns
+// its own client (same convention as `lib/ai/blog.ts`) rather than sharing
+// one, so this module tree never forces a Supabase dependency on a consumer
+// who only wants the framework-agnostic builders above.
+export { SettingsService } from './services/settings-service';
+export { RedirectsService } from './services/redirects-service';
+export type { StoredRedirect } from './services/redirects-service';
+export { TemplatesService } from './services/templates-service';
+export { PagesService } from './services/pages-service';
+export type { PagesPage } from './services/pages-service';
+export type { SeoTemplate } from './admin/TemplateManager';
+export type { SeoPageRecord } from './admin/BulkOperationsView';

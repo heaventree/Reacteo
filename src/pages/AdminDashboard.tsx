@@ -1,19 +1,114 @@
-import React, { useState } from 'react';
-import { LayoutDashboard, Zap, FileText, Settings } from 'lucide-react';
-import { SEO } from '../lib/seo';
+import React, { useState, useEffect, useCallback } from 'react';
+import { LayoutDashboard, Zap, FileText, Settings, Link2, LayoutTemplate, ListChecks } from 'lucide-react';
+import {
+  SEO,
+  SettingsPanel,
+  RedirectsPanel,
+  TemplateManager,
+  BulkOperationsView,
+  SettingsService,
+  RedirectsService,
+  TemplatesService,
+  PagesService,
+  type GlobalSettings,
+  type RedirectRow,
+  type RedirectRule,
+  type SeoTemplate,
+  type SeoPageRecord,
+} from '../lib/seo';
 import { AIModelsConfig } from '../components/AIModelsConfig';
 import { BlogEditor } from '../components/BlogEditor';
 import { SEOAuditReport } from '../components/SEOAuditReport';
 import { useAIAudit } from '../lib/ai/hooks';
 import type { AIModel } from '../lib/ai/types';
 
-type AdminTab = 'overview' | 'models' | 'audit' | 'blog' | 'settings';
+type AdminTab =
+  | 'overview'
+  | 'models'
+  | 'audit'
+  | 'blog'
+  | 'settings'
+  | 'redirects'
+  | 'templates'
+  | 'bulk';
+
+const BULK_PAGE_SIZE = 25;
 
 export const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [selectedModel, setSelectedModel] = useState<AIModel | null>(null);
   const [auditPagePath, setAuditPagePath] = useState('');
   const { auditPage, auditResult, auditing } = useAIAudit();
+
+  const [settings, setSettings] = useState<GlobalSettings | undefined>(undefined);
+  const [redirects, setRedirects] = useState<RedirectRow[]>([]);
+  const [templates, setTemplates] = useState<SeoTemplate[]>([]);
+  const [bulkPages, setBulkPages] = useState<SeoPageRecord[]>([]);
+  const [bulkTotalCount, setBulkTotalCount] = useState(0);
+  const [bulkPage, setBulkPage] = useState(1);
+
+  const loadBulkPages = useCallback((pageNum: number) => {
+    PagesService.list(pageNum, BULK_PAGE_SIZE)
+      .then(({ records, totalCount }) => {
+        setBulkPages(records);
+        setBulkTotalCount(totalCount);
+      })
+      .catch((err) => console.error('Failed to load SEO pages:', err));
+  }, []);
+
+  useEffect(() => {
+    SettingsService.get()
+      .then((s) => setSettings(s ?? undefined))
+      .catch((err) => console.error('Failed to load SEO settings:', err));
+    RedirectsService.list()
+      .then(setRedirects)
+      .catch((err) => console.error('Failed to load redirects:', err));
+    TemplatesService.list()
+      .then(setTemplates)
+      .catch((err) => console.error('Failed to load SEO templates:', err));
+    loadBulkPages(1);
+  }, [loadBulkPages]);
+
+  const handleSaveTemplate = useCallback(async (template: Partial<SeoTemplate>) => {
+    const saved = await TemplatesService.save(template);
+    setTemplates((prev) => {
+      const exists = prev.some((t) => t.id === saved.id);
+      return exists ? prev.map((t) => (t.id === saved.id ? saved : t)) : [saved, ...prev];
+    });
+  }, []);
+
+  const handleDeleteTemplate = useCallback(async (id: string) => {
+    await TemplatesService.remove(id);
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const handleBulkPageChange = useCallback(
+    (nextPage: number) => {
+      setBulkPage(nextPage);
+      loadBulkPages(nextPage);
+    },
+    [loadBulkPages]
+  );
+
+  const handleSaveSettings = useCallback(async (next: GlobalSettings) => {
+    const saved = await SettingsService.save(next);
+    setSettings(saved);
+  }, []);
+
+  const handleCreateRedirect = useCallback(async (rule: RedirectRule) => {
+    const created = await RedirectsService.create(rule);
+    setRedirects((prev) => [created, ...prev]);
+  }, []);
+
+  const handleToggleRedirect = useCallback(async (id: string, enabled: boolean) => {
+    const updated = await RedirectsService.update(id, { enabled });
+    setRedirects((prev) => prev.map((r) => (r.id === id ? updated : r)));
+  }, []);
+
+  const handleDeleteRedirect = useCallback(async (id: string) => {
+    await RedirectsService.remove(id);
+    setRedirects((prev) => prev.filter((r) => r.id !== id));
+  }, []);
 
   const handleRunAudit = async () => {
     if (!auditPagePath || !selectedModel) {
@@ -62,6 +157,10 @@ export const AdminDashboard: React.FC = () => {
                   { id: 'models', label: 'AI Models', icon: Zap },
                   { id: 'audit', label: 'SEO Audit', icon: Settings },
                   { id: 'blog', label: 'Blog', icon: FileText },
+                  { id: 'templates', label: 'Templates', icon: LayoutTemplate },
+                  { id: 'bulk', label: 'Bulk Operations', icon: ListChecks },
+                  { id: 'redirects', label: 'Redirects', icon: Link2 },
+                  { id: 'settings', label: 'Settings', icon: Settings },
                 ] as const
               ).map(({ id, label, icon: Icon }) => (
                 <button
@@ -192,6 +291,51 @@ export const AdminDashboard: React.FC = () => {
             <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
               <BlogEditor />
             </div>
+          )}
+
+          {/* Templates Tab */}
+          {activeTab === 'templates' && (
+            <TemplateManager
+              templates={templates}
+              onSaveTemplate={handleSaveTemplate}
+              onDeleteTemplate={handleDeleteTemplate}
+              onRunBulkGeneration={(templateId) => TemplatesService.queueBulkGeneration(templateId)}
+            />
+          )}
+
+          {/* Bulk Operations Tab */}
+          {activeTab === 'bulk' && (
+            <BulkOperationsView
+              pages={bulkPages}
+              totalCount={bulkTotalCount}
+              currentPage={bulkPage}
+              onPageChange={handleBulkPageChange}
+              onRunAudit={(pageIds) => PagesService.queueAudit(pageIds).then(() => loadBulkPages(bulkPage))}
+              onRunAiGeneration={(pageIds) => PagesService.queueAiGeneration(pageIds)}
+            />
+          )}
+
+          {/* Redirects Tab */}
+          {activeTab === 'redirects' && (
+            <RedirectsPanel
+              redirects={redirects}
+              onCreate={handleCreateRedirect}
+              onToggle={handleToggleRedirect}
+              onDelete={handleDeleteRedirect}
+            />
+          )}
+
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <SettingsPanel
+              initialSettings={settings}
+              onSaveSettings={handleSaveSettings}
+              onSaveAiKey={async () => {
+                // AI provider keys are a separate concern from SEO settings
+                // (see `ai_keys` table / AI Models tab) and are not wired
+                // through this panel's save path.
+              }}
+            />
           )}
         </main>
       </div>

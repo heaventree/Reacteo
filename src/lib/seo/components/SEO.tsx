@@ -121,14 +121,19 @@ export const SEO = ({
     return Array.isArray(jsonLd) ? jsonLd : [jsonLd];
   }, [jsonLd]);
 
+  // Site-wide "discourage search engines" beats every per-page setting —
+  // same precedence LV SEO and SEOPress use for their equivalent switch.
+  const effectiveNoindex = config.discourageSearchEngines || noindex;
+  const effectiveNofollow = config.discourageSearchEngines || nofollow;
+
   const robotsMeta = useMemo(() => {
     const parts: string[] = [];
-    parts.push(noindex ? 'noindex' : 'index');
-    parts.push(nofollow ? 'nofollow' : 'follow');
+    parts.push(effectiveNoindex ? 'noindex' : 'index');
+    parts.push(effectiveNofollow ? 'nofollow' : 'follow');
 
     // Granular directives are meaningless on a page that is not indexed, so
     // only emit them when the page is actually eligible to appear.
-    if (!noindex) {
+    if (!effectiveNoindex) {
       const d: RobotsDirectives = robots ?? {};
       // Default to the most permissive preview settings: answer engines and
       // rich results require these to surface content at all, and the silent
@@ -144,7 +149,7 @@ export const SEO = ({
     }
 
     return parts.join(', ');
-  }, [noindex, nofollow, robots]);
+  }, [effectiveNoindex, effectiveNofollow, robots]);
 
   const articleAuthors = useMemo(() => {
     if (!article?.author) return [];
@@ -170,6 +175,22 @@ export const SEO = ({
       <link rel="canonical" href={finalCanonical} />
       {author && <meta name="author" content={author} />}
       {themeColor && <meta name="theme-color" content={themeColor} />}
+
+      {/* Search-engine site-verification tags — applied site-wide from config,
+          same role as SEOPress's / LV SEO's verification settings. */}
+      {config.verification?.google && (
+        <meta name="google-site-verification" content={config.verification.google} />
+      )}
+      {config.verification?.bing && <meta name="msvalidate.01" content={config.verification.bing} />}
+      {config.verification?.yandex && (
+        <meta name="yandex-verification" content={config.verification.yandex} />
+      )}
+      {config.verification?.pinterest && (
+        <meta name="p:domain_verify" content={config.verification.pinterest} />
+      )}
+      {config.verification?.facebook && (
+        <meta name="facebook-domain-verification" content={config.verification.facebook} />
+      )}
 
       {/* Alternate language versions */}
       {alternates?.map((alt) => (
